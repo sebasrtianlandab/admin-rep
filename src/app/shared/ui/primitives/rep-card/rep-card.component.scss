@@ -3,6 +3,10 @@
 }
 
 .rep-card {
+  display: flex;
+  min-height: 0;
+  height: 100%;
+  flex-direction: column;
   border-radius: var(--radius-lg);
   border: 1px solid color-mix(in srgb, var(--border) 85%, var(--rep-surface-app));
   background: var(--rep-surface-card);
@@ -53,6 +57,8 @@
 
 .rep-card__body {
   min-width: 0;
+  min-height: 0;
+  flex: 1 1 auto;
 }
 
 .rep-card__footer {

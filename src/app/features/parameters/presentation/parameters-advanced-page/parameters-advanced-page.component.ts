@@ -1,7 +1,8 @@
 import { DatePipe } from '@angular/common';
-import { Component, OnInit, computed, inject, model } from '@angular/core';
+import { Component, OnInit, computed, effect, inject, model, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ParametersAdvancedFacade } from '@features/parameters/application/parameters-advanced.facade';
+import { RepConfirmDialogComponent } from '@shared/ui/composite/rep-confirm-dialog/rep-confirm-dialog.component';
 import { RepBadgeComponent } from '@shared/ui/primitives/rep-badge/rep-badge.component';
 import { RepButtonComponent } from '@shared/ui/primitives/rep-button/rep-button.component';
 import { RepCardComponent } from '@shared/ui/primitives/rep-card/rep-card.component';
@@ -15,7 +16,6 @@ import { RepPageHeaderComponent } from '@shared/ui/composite/rep-page-header/rep
 import { RepTableToolbarComponent } from '@shared/ui/composite/rep-table-toolbar/rep-table-toolbar.component';
 import { RepToolbarComponent } from '@shared/ui/composite/rep-toolbar/rep-toolbar.component';
 import { RepErrorStateComponent } from '@shared/ui/feedback/rep-error-state/rep-error-state.component';
-import { RepKpiCardComponent } from '@shared/ui/data-display/rep-kpi-card/rep-kpi-card.component';
 import { RepIconsModule } from '@shared/ui/icons/rep-icons.module';
 import { RepPageContainerComponent } from '@shared/ui/layout/rep-page-container/rep-page-container.component';
 import { RepSectionComponent } from '@shared/ui/layout/rep-section/rep-section.component';
@@ -26,8 +26,8 @@ import { RepSectionComponent } from '@shared/ui/layout/rep-section/rep-section.c
     DatePipe,
     RouterLink,
     RepIconsModule,
+    RepConfirmDialogComponent,
     RepPageHeaderComponent,
-    RepKpiCardComponent,
     RepCardComponent,
     RepDataTableComponent,
     RepBadgeComponent,
@@ -49,6 +49,8 @@ export class ParametersAdvancedPageComponent implements OnInit {
   readonly loading = this.facade.loading;
   readonly error = this.facade.error;
   readonly search = model('');
+  readonly selectedKey = signal<string | null>(null);
+  readonly confirmOpen = signal(false);
 
   readonly columns: RepTableColumn[] = [
     { key: 'key', label: 'Clave', sortable: true, truncate: true },
@@ -68,6 +70,7 @@ export class ParametersAdvancedPageComponent implements OnInit {
       },
     },
     { key: 'changed', label: 'Última modif.', sortable: true },
+    { key: 'actions', label: 'Acciones', actions: true, width: '8rem' },
   ];
 
   readonly filteredRows = computed<RepTableRow[]>(() => {
@@ -85,6 +88,25 @@ export class ParametersAdvancedPageComponent implements OnInit {
     this.search().trim() !== '' && this.filteredRows().length === 0 ? 'filtered' : 'empty',
   );
 
+  readonly selectedRow = computed<RepTableRow | null>(() => {
+    const key = this.selectedKey();
+    return this.snapshot()?.rows.find((row) => String(row['key']) === key) ?? null;
+  });
+
+  constructor() {
+    effect(() => {
+      const rows = this.snapshot()?.rows ?? [];
+      const current = this.selectedKey();
+      if (!rows.length) {
+        this.selectedKey.set(null);
+        return;
+      }
+      if (!current || !rows.some((row) => String(row['key']) === current)) {
+        this.selectedKey.set(String(rows[0]['key']));
+      }
+    });
+  }
+
   ngOnInit(): void {
     this.facade.load();
   }
@@ -95,5 +117,29 @@ export class ParametersAdvancedPageComponent implements OnInit {
 
   onFilterReset(): void {
     this.search.set('');
+  }
+
+  selectRow(key: string): void {
+    this.selectedKey.set(key);
+  }
+
+  openConfirm(): void {
+    this.confirmOpen.set(true);
+  }
+
+  rowId(row: RepTableRow): string {
+    return String(row['key'] ?? '');
+  }
+
+  rowText(row: RepTableRow, key: string): string {
+    const value = row[key];
+    return value == null ? '' : String(value);
+  }
+
+  rowRiskVariant(row: RepTableRow): 'danger' | 'warning' | 'neutral' {
+    const risk = this.rowText(row, 'risk');
+    if (risk === 'Crítico') return 'danger';
+    if (risk === 'Alto') return 'warning';
+    return 'neutral';
   }
 }

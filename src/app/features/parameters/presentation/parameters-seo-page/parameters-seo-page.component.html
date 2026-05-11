@@ -8,16 +8,28 @@
       <app-rep-page-header
         eyebrow="Descubrimiento"
         title="SEO y marketing"
-        description="Metadatos por defecto, Open Graph y política de sitemap. Vista previa SERP se añadirá con iframe seguro."
+        description="Define metadata global, Open Graph y canonical con un preview SERP contextual."
       />
     </div>
-    <div class="flex shrink-0 items-center gap-2">
+    <div class="parameters-shell__actions">
       @if (data(); as d) {
-        <app-rep-badge variant="outline" [label]="'Mock · ' + (d.generatedAt | date : 'medium')" />
+        <div class="parameters-shell__meta">
+          <app-rep-badge variant="outline" [label]="'Editó · ' + d.audit.updatedBy" />
+          <app-rep-badge variant="neutral" [label]="'Últ. modif. · ' + (d.audit.updatedAt | date : 'medium')" />
+          @if (dirty()) {
+            <app-rep-badge variant="warning" label="Cambios sin guardar" />
+          }
+        </div>
       }
-      <app-rep-button variant="outline" size="md" [loading]="loading()" (clicked)="refresh()">
+      <app-rep-button variant="ghost" size="md" [disabled]="!dirty() || saving()" (clicked)="resetDraft()">
+        Cancelar
+      </app-rep-button>
+      <app-rep-button variant="outline" size="md" [loading]="loading()" [disabled]="saving()" (clicked)="refresh()">
         <lucide-icon name="refresh-cw" [size]="16" [class.animate-spin]="loading()" />
-        Actualizar
+        Recargar
+      </app-rep-button>
+      <app-rep-button size="md" [loading]="saving()" [disabled]="!dirty() || !canSave()" (clicked)="save()">
+        Guardar cambios
       </app-rep-button>
     </div>
   </app-rep-toolbar>
@@ -26,30 +38,96 @@
     <app-rep-error-state title="No se pudo cargar la sección" [description]="err" />
   }
 
-  <app-rep-section ariaLabel="Metadatos">
-    <div class="parameters-shell__grid">
-      @if (loading() && !data()) {
-        <app-rep-card title="Cargando…" [compact]="true" [padding]="'sm'">
-          <p class="rep-muted-text rep-caption">Obteniendo snapshot mock.</p>
-        </app-rep-card>
-      } @else {
-        @if (data(); as s) {
-          <app-rep-card title="Etiquetas por defecto" [compact]="true" [padding]="'sm'">
-            <dl class="parameters-shell__dl">
-              <dt>Title</dt>
-              <dd>{{ s.defaultTitle }}</dd>
-              <dt>Description</dt>
-              <dd>{{ s.defaultDescription }}</dd>
-            </dl>
+  <app-rep-section ariaLabel="Editor SEO">
+    @if (draft(); as draft) {
+      <div class="parameters-shell__layout">
+        <div class="parameters-shell__main">
+          <app-rep-card title="Metadata por defecto" subtitle="Campos globales editables desde admin" [padding]="'sm'">
+            <div class="parameters-shell__group">
+              <app-rep-input
+                label="Meta title"
+                [disabled]="saving()"
+                [error]="draft.metaTitle.trim() === '' ? 'El meta title es obligatorio.' : null"
+                [value]="draft.metaTitle"
+                (valueChange)="patch('metaTitle', $event)"
+              />
+              <app-rep-textarea
+                label="Meta description"
+                [rows]="4"
+                [disabled]="saving()"
+                [error]="draft.metaDescription.trim() === '' ? 'La descripción es obligatoria.' : null"
+                [value]="draft.metaDescription"
+                (valueChange)="patch('metaDescription', $event)"
+              />
+              <div class="parameters-shell__form-grid">
+                <app-rep-input
+                  label="OG image"
+                  [disabled]="saving()"
+                  [value]="draft.ogImage"
+                  (valueChange)="patch('ogImage', $event)"
+                />
+                <app-rep-input
+                  label="Canonical"
+                  [disabled]="saving()"
+                  [value]="draft.canonical"
+                  (valueChange)="patch('canonical', $event)"
+                />
+                <app-rep-select
+                  label="Robots"
+                  [disabled]="saving()"
+                  [options]="robotsOptions"
+                  [value]="draft.robots"
+                  (valueChange)="setRobots($event)"
+                />
+              </div>
+              <app-rep-textarea
+                label="Keywords"
+                helperText="Separadas por comas."
+                [rows]="3"
+                [disabled]="saving()"
+                [value]="draft.keywords"
+                (valueChange)="patch('keywords', $event)"
+              />
+            </div>
           </app-rep-card>
-          <app-rep-card title="Open Graph" [compact]="true" [padding]="'sm'">
-            <p class="rep-caption">{{ s.ogImageNote }}</p>
-          </app-rep-card>
-          <app-rep-card title="Sitemap" [compact]="true" [padding]="'sm'">
-            <p class="rep-caption">{{ s.sitemapPolicy }}</p>
-          </app-rep-card>
-        }
-      }
-    </div>
+        </div>
+
+        <div class="parameters-shell__aside">
+          @if (data(); as snapshot) {
+            <app-rep-card title="Preview SERP" subtitle="Simulación Google" [padding]="'sm'">
+              <div class="parameters-shell__preview-frame">
+                <div class="parameters-shell__seo-title">{{ draft.metaTitle }}</div>
+                <div class="parameters-shell__seo-url">{{ snapshot.previewUrl }}</div>
+                <div class="parameters-shell__seo-desc">{{ draft.metaDescription }}</div>
+              </div>
+
+              <div class="parameters-shell__preview-surface">
+                <strong>Open Graph</strong>
+                <p class="rep-caption parameters-shell__muted">{{ draft.ogImage }}</p>
+                <div class="parameters-shell__pill-row">
+                  <app-rep-badge variant="outline" [label]="draft.robots" />
+                  <app-rep-badge variant="neutral" [label]="keywordList().length + ' keywords'" />
+                </div>
+              </div>
+            </app-rep-card>
+
+            <app-rep-card title="Auditoría" subtitle="Último cambio guardado" [padding]="'sm'">
+              <dl class="parameters-shell__dl">
+                <dt>Editor</dt>
+                <dd>{{ snapshot.audit.updatedBy }} · {{ snapshot.audit.editorRole }}</dd>
+                <dt>Resumen</dt>
+                <dd>{{ snapshot.audit.summary }}</dd>
+                <dt>Generado</dt>
+                <dd>{{ snapshot.generatedAt | date : 'medium' }}</dd>
+              </dl>
+            </app-rep-card>
+          }
+        </div>
+      </div>
+    } @else if (loading()) {
+      <app-rep-card title="Cargando SEO" [padding]="'sm'">
+        <p class="rep-muted-text rep-caption">Preparando editor de metadata y preview SERP.</p>
+      </app-rep-card>
+    }
   </app-rep-section>
 </app-rep-page-container>

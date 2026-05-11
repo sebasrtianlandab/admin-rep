@@ -8,16 +8,28 @@
       <app-rep-page-header
         eyebrow="Maestros"
         title="Catálogos"
-        description="Referencias maestras que alimentan filtros y formularios. Edición tabular detallada se habilitará por catálogo."
+        description="Gestión tabular de catálogos con editor lateral y acciones inline, porque aquí sí el dominio es naturalmente estructurado."
       />
     </div>
-    <div class="flex shrink-0 items-center gap-2">
+    <div class="parameters-shell__actions">
       @if (data(); as d) {
-        <app-rep-badge variant="outline" [label]="'Mock · ' + (d.generatedAt | date : 'medium')" />
+        <div class="parameters-shell__meta">
+          <app-rep-badge variant="outline" [label]="'Editó · ' + d.audit.updatedBy" />
+          <app-rep-badge variant="neutral" [label]="'Últ. modif. · ' + (d.audit.updatedAt | date : 'medium')" />
+          @if (dirty()) {
+            <app-rep-badge variant="warning" label="Cambios sin guardar" />
+          }
+        </div>
       }
-      <app-rep-button variant="outline" size="md" [loading]="loading()" (clicked)="refresh()">
+      <app-rep-button variant="ghost" size="md" [disabled]="!dirty() || saving()" (clicked)="resetDraft()">
+        Cancelar
+      </app-rep-button>
+      <app-rep-button variant="outline" size="md" [loading]="loading()" [disabled]="saving()" (clicked)="refresh()">
         <lucide-icon name="refresh-cw" [size]="16" [class.animate-spin]="loading()" />
-        Actualizar
+        Recargar
+      </app-rep-button>
+      <app-rep-button size="md" [loading]="saving()" [disabled]="!dirty()" (clicked)="save()">
+        Guardar cambios
       </app-rep-button>
     </div>
   </app-rep-toolbar>
@@ -26,26 +38,103 @@
     <app-rep-error-state title="No se pudo cargar la sección" [description]="err" />
   }
 
-  <app-rep-section ariaLabel="Catálogos">
-    <div class="parameters-shell__grid">
-      @if (loading() && !data()) {
-        <app-rep-card title="Cargando…" [compact]="true" [padding]="'sm'">
-          <p class="rep-muted-text rep-caption">Obteniendo snapshot mock.</p>
-        </app-rep-card>
-      } @else {
-        @if (data(); as cat) {
-          @for (row of cat.catalogs; track row.name) {
-            <app-rep-card [title]="row.name" [compact]="true" [padding]="'sm'">
-              <dl class="parameters-shell__dl">
-                <dt>Filas (mock)</dt>
-                <dd>{{ row.rows }}</dd>
-                <dt>Última sync</dt>
-                <dd>{{ row.lastSync | date : 'medium' }}</dd>
-              </dl>
+  <app-rep-section ariaLabel="Editor de catálogos">
+    @if (draft(); as draft) {
+      <div class="parameters-shell__table-layout">
+        <div class="parameters-shell__main">
+          <app-rep-card title="Catálogos maestros" subtitle="Tabla enterprise con filtros y acciones inline" [padding]="'sm'">
+            <app-rep-table-toolbar>
+              <div repTableToolbarStart class="min-w-0 flex-1">
+                <app-rep-filter-bar
+                  [(search)]="search"
+                  searchPlaceholder="Buscar catálogo o tipo…"
+                  [resetDisabled]="search().trim() === ''"
+                  (reset)="onFilterReset()"
+                />
+              </div>
+            </app-rep-table-toolbar>
+
+            <app-rep-data-table
+              [columns]="columns"
+              [rows]="filteredRows()"
+              [loading]="loading() && !data()"
+              [rowActions]="catalogActions"
+              exportFileName="parametros-catalogos"
+              exportTitle="Parámetros · Catálogos"
+              [paginationEnabled]="true"
+              [pageSize]="6"
+              emptyMessage="No hay catálogos."
+              emptyDescription="Ajusta el filtro o sincroniza la fuente correspondiente."
+            />
+
+            <ng-template #catalogActions let-row>
+              <app-rep-button variant="ghost" size="sm" (clicked)="selectCatalog(rowId(row))">
+                Editar
+              </app-rep-button>
+            </ng-template>
+          </app-rep-card>
+        </div>
+
+        <div class="parameters-shell__aside">
+          @if (selected(); as catalog) {
+            <app-rep-card title="Editor lateral" subtitle="Propiedades operativas del catálogo" [padding]="'sm'">
+              <div class="parameters-shell__group">
+                <app-rep-input
+                  label="Nombre"
+                  [disabled]="saving()"
+                  [value]="catalog.name"
+                  (valueChange)="patchSelected({ name: $event })"
+                />
+                <div class="parameters-shell__form-grid">
+                  <app-rep-input
+                    label="Tipo"
+                    [disabled]="saving()"
+                    [value]="catalog.type"
+                    (valueChange)="patchSelected({ type: $event })"
+                  />
+                  <app-rep-input
+                    label="Filas"
+                    type="number"
+                    [disabled]="saving()"
+                    [value]="asText(catalog.rows)"
+                    (valueChange)="patchSelected({ rows: asNumber($event) })"
+                  />
+                  <app-rep-select
+                    label="Sync strategy"
+                    [disabled]="saving()"
+                    [options]="syncOptions"
+                    [value]="catalog.syncStrategy"
+                    (valueChange)="setSyncStrategy($event)"
+                  />
+                </div>
+                <app-rep-textarea
+                  label="Descripción"
+                  [rows]="3"
+                  [disabled]="saving()"
+                  [value]="catalog.description"
+                  (valueChange)="patchSelected({ description: $event })"
+                />
+                <app-rep-switch
+                  label="Visible en formularios"
+                  [disabled]="saving()"
+                  [checked]="catalog.visible"
+                  (checkedChange)="patchSelected({ visible: $event })"
+                />
+                <app-rep-switch
+                  label="Editable desde admin"
+                  [disabled]="saving()"
+                  [checked]="catalog.editable"
+                  (checkedChange)="patchSelected({ editable: $event })"
+                />
+              </div>
             </app-rep-card>
           }
-        }
-      }
-    </div>
+        </div>
+      </div>
+    } @else if (loading()) {
+      <app-rep-card title="Cargando catálogos" [padding]="'sm'">
+        <p class="rep-muted-text rep-caption">Preparando catálogo tabular editable.</p>
+      </app-rep-card>
+    }
   </app-rep-section>
 </app-rep-page-container>

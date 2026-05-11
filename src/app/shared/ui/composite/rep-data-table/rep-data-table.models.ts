@@ -4,6 +4,8 @@ export type RepTableColumnAlign = 'left' | 'right' | 'center';
 
 export type RepTableCellType = 'text' | 'badge' | 'actions';
 
+export type RepTableRow = Record<string, unknown>;
+
 /** Column definition for mock-friendly ERP tables (no backend coupling). */
 export interface RepTableColumn {
   key: string;
@@ -21,13 +23,17 @@ export interface RepTableColumn {
   /** Client-side sortable column (mock). */
   sortable?: boolean;
   cellType?: RepTableCellType;
+  /** Excluye la columna del payload exportado. Por defecto `true` salvo acciones. */
+  exportable?: boolean;
+  /** Etiqueta alternativa para encabezados exportados. */
+  exportLabel?: string;
+  /** Valor serializado específico para exportación. */
+  exportValue?: (row: RepTableRow) => string;
   /** When `cellType === 'badge'`, default variant if no map match */
   badgeVariant?: RepBadgeVariant;
   /** Map cell string value → badge variant */
   badgeVariantByValue?: Partial<Record<string, RepBadgeVariant>>;
 }
-
-export type RepTableRow = Record<string, unknown>;
 
 export function compareRepCellValues(a: unknown, b: unknown, dir: 'asc' | 'desc'): number {
   const mul = dir === 'asc' ? 1 : -1;

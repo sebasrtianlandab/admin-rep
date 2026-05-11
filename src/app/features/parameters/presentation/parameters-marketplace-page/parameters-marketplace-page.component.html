@@ -8,16 +8,28 @@
       <app-rep-page-header
         eyebrow="Operación"
         title="Marketplace"
-        description="Estados de publicación, reglas de destacados y límites del catálogo. Gobierno del flujo operativo, no inventario técnico."
+        description="Configura workflow, badges y límites operativos desde una consola de settings orientada a operación."
       />
     </div>
-    <div class="flex shrink-0 items-center gap-2">
+    <div class="parameters-shell__actions">
       @if (data(); as d) {
-        <app-rep-badge variant="outline" [label]="'Mock · ' + (d.generatedAt | date : 'medium')" />
+        <div class="parameters-shell__meta">
+          <app-rep-badge variant="outline" [label]="'Editó · ' + d.audit.updatedBy" />
+          <app-rep-badge variant="neutral" [label]="'Últ. modif. · ' + (d.audit.updatedAt | date : 'medium')" />
+          @if (dirty()) {
+            <app-rep-badge variant="warning" label="Cambios sin guardar" />
+          }
+        </div>
       }
-      <app-rep-button variant="outline" size="md" [loading]="loading()" (clicked)="refresh()">
+      <app-rep-button variant="ghost" size="md" [disabled]="!dirty() || saving()" (clicked)="resetDraft()">
+        Cancelar
+      </app-rep-button>
+      <app-rep-button variant="outline" size="md" [loading]="loading()" [disabled]="saving()" (clicked)="refresh()">
         <lucide-icon name="refresh-cw" [size]="16" [class.animate-spin]="loading()" />
-        Actualizar
+        Recargar
+      </app-rep-button>
+      <app-rep-button size="md" [loading]="saving()" [disabled]="!dirty() || !canSave()" (clicked)="save()">
+        Guardar cambios
       </app-rep-button>
     </div>
   </app-rep-toolbar>
@@ -26,44 +38,179 @@
     <app-rep-error-state title="No se pudo cargar la sección" [description]="err" />
   }
 
-  <app-rep-section ariaLabel="Estados y reglas">
-    <div class="parameters-shell__grid">
-      @if (loading() && !data()) {
-        <app-rep-card title="Cargando…" [compact]="true" [padding]="'sm'">
-          <p class="rep-muted-text rep-caption">Obteniendo snapshot mock.</p>
-        </app-rep-card>
-      } @else {
-        @if (data(); as m) {
-          <app-rep-card title="Estados de propiedad" subtitle="Etiqueta y color por código" [compact]="true" [padding]="'sm'">
-            <ul class="parameters-shell__list">
-              @for (row of m.statusRows; track row.code) {
-                <li class="parameters-shell__list-item">
-                  <span class="font-semibold">{{ row.label }}</span>
-                  <span class="parameters-shell__pill-row">
-                    <app-rep-badge variant="outline" [label]="row.code" />
-                    @if (row.active) {
-                      <app-rep-badge variant="success" label="Activo" />
-                    } @else {
-                      <app-rep-badge variant="neutral" label="Inactivo" />
-                    }
-                    <span
-                      class="parameters-shell__swatch"
-                      [style.background]="row.color"
-                      [title]="row.color"
-                    ></span>
-                  </span>
-                </li>
+  <app-rep-section ariaLabel="Estados y reglas del marketplace">
+    @if (draft(); as draft) {
+      <div class="parameters-shell__layout">
+        <div class="parameters-shell__main">
+          <app-rep-card title="Estados de propiedad" subtitle="Cards operativas con acceso a edición lateral" [padding]="'sm'">
+            <div class="parameters-shell__stack">
+              @for (status of orderedStatuses(); track status.id) {
+                <button
+                  type="button"
+                  class="parameters-shell__status-card"
+                  [class.parameters-shell__status-card--active]="selectedStatusId() === status.id"
+                  (click)="selectStatus(status.id)"
+                >
+                  <div class="parameters-shell__editable-header">
+                    <div class="parameters-shell__title-block">
+                      <span class="parameters-shell__title">{{ status.label }}</span>
+                      <span class="parameters-shell__muted rep-caption">{{ status.description }}</span>
+                    </div>
+                    <div class="parameters-shell__pill-row">
+                      <app-rep-badge variant="outline" [label]="status.code" />
+                      <app-rep-badge [variant]="status.active ? 'success' : 'neutral'" [label]="status.active ? 'Activo' : 'Inactivo'" />
+                      <span class="parameters-shell__swatch" [style.background]="status.color"></span>
+                    </div>
+                  </div>
+                  <div class="parameters-shell__pill-row">
+                    <lucide-icon [name]="status.icon" [size]="16" />
+                    <span class="rep-caption parameters-shell__muted">Orden {{ status.order }}</span>
+                  </div>
+                </button>
               }
-            </ul>
+            </div>
           </app-rep-card>
-          <app-rep-card title="Destacados" [compact]="true" [padding]="'sm'">
-            <p class="rep-caption">{{ m.featuredDefault }}</p>
+
+          <app-rep-card title="Reglas operativas" subtitle="Lógica comercial y de moderación del catálogo" [padding]="'sm'">
+            <div class="parameters-shell__form-grid">
+              <app-rep-select
+                label="Modo de moderación"
+                [disabled]="saving()"
+                [options]="moderationOptions"
+                [value]="draft.rules.moderationMode"
+                (valueChange)="setModerationMode($event)"
+              />
+              <app-rep-input
+                label="Límite de publicaciones"
+                type="number"
+                [disabled]="saving()"
+                [value]="asText(draft.rules.publicationLimit)"
+                (valueChange)="patchRules('publicationLimit', asNumber($event))"
+              />
+              <app-rep-input
+                label="Destacados por zona"
+                type="number"
+                [disabled]="saving()"
+                [value]="asText(draft.rules.maxFeaturedPerZone)"
+                (valueChange)="patchRules('maxFeaturedPerZone', asNumber($event))"
+              />
+              <app-rep-input
+                label="SLA revisión (horas)"
+                type="number"
+                [disabled]="saving()"
+                [value]="asText(draft.rules.reviewSlaHours)"
+                (valueChange)="patchRules('reviewSlaHours', asNumber($event))"
+              />
+            </div>
+
+            <app-rep-textarea
+              label="Lógica de destacados"
+              [rows]="3"
+              [disabled]="saving()"
+              [value]="draft.rules.featuredLogic"
+              (valueChange)="patchRules('featuredLogic', $event)"
+            />
+            <app-rep-textarea
+              label="Política de badges"
+              [rows]="2"
+              [disabled]="saving()"
+              [value]="draft.rules.badgesPolicy"
+              (valueChange)="patchRules('badgesPolicy', $event)"
+            />
           </app-rep-card>
-          <app-rep-card title="Publicación" [compact]="true" [padding]="'sm'">
-            <p class="rep-caption">{{ m.publishRuleSummary }}</p>
-          </app-rep-card>
-        }
-      }
-    </div>
+        </div>
+
+        <div class="parameters-shell__aside">
+          @if (selectedStatus(); as status) {
+            <app-rep-card title="Editor lateral" subtitle="Configura etiqueta, color e icono del estado" [padding]="'sm'">
+              <div class="parameters-shell__group">
+                <app-rep-input
+                  label="Label"
+                  [disabled]="saving()"
+                  [error]="status.label.trim() === '' ? 'La etiqueta es obligatoria.' : null"
+                  [value]="status.label"
+                  (valueChange)="patchStatus(status.id, { label: $event })"
+                />
+                <div class="parameters-shell__form-grid">
+                  <app-rep-input
+                    label="Código"
+                    [disabled]="saving()"
+                    [value]="status.code"
+                    (valueChange)="patchStatus(status.id, { code: $event })"
+                  />
+                  <app-rep-input
+                    label="Orden"
+                    type="number"
+                    [disabled]="saving()"
+                    [value]="asText(status.order)"
+                    (valueChange)="patchStatus(status.id, { order: asNumber($event) })"
+                  />
+                  <app-rep-input
+                    label="Color"
+                    [disabled]="saving()"
+                    [error]="status.color.trim() === '' ? 'El color es obligatorio.' : null"
+                    [value]="status.color"
+                    (valueChange)="patchStatus(status.id, { color: $event })"
+                  />
+                  <app-rep-select
+                    label="Icono"
+                    [disabled]="saving()"
+                    [options]="iconOptions"
+                    [value]="status.icon"
+                    (valueChange)="setStatusIcon($event)"
+                  />
+                </div>
+
+                <app-rep-textarea
+                  label="Descripción"
+                  [rows]="3"
+                  [disabled]="saving()"
+                  [value]="status.description"
+                  (valueChange)="patchStatus(status.id, { description: $event })"
+                />
+
+                <app-rep-switch
+                  label="Estado activo"
+                  helperText="Si se desactiva, desaparece del workflow disponible."
+                  [disabled]="saving()"
+                  [checked]="status.active"
+                  (checkedChange)="patchStatus(status.id, { active: $event })"
+                />
+              </div>
+            </app-rep-card>
+
+            <app-rep-card title="Preview de workflow" subtitle="Visualización del badge y secuencia actual" [padding]="'sm'">
+              <div class="parameters-shell__preview">
+                <div class="parameters-shell__workflow">
+                  @for (node of orderedStatuses(); track node.id) {
+                    <span class="parameters-shell__workflow-node">
+                      <span class="parameters-shell__swatch" [style.background]="node.color"></span>
+                      {{ node.label }}
+                    </span>
+                    @if (!$last) {
+                      <lucide-icon name="chevron-right" [size]="14" class="parameters-shell__muted" />
+                    }
+                  }
+                </div>
+
+                <div class="parameters-shell__preview-surface">
+                  <div class="parameters-shell__pill-row">
+                    <lucide-icon [name]="status.icon" [size]="16" />
+                    <app-rep-badge variant="outline" [label]="status.code" />
+                    <app-rep-badge [variant]="status.active ? 'success' : 'neutral'" [label]="status.active ? 'Activo' : 'Inactivo'" />
+                  </div>
+                  <strong>{{ status.label }}</strong>
+                  <p class="rep-caption parameters-shell__muted">{{ status.description }}</p>
+                </div>
+              </div>
+            </app-rep-card>
+          }
+        </div>
+      </div>
+    } @else if (loading()) {
+      <app-rep-card title="Cargando marketplace" [padding]="'sm'">
+        <p class="rep-muted-text rep-caption">Preparando workflow editable del marketplace.</p>
+      </app-rep-card>
+    }
   </app-rep-section>
 </app-rep-page-container>

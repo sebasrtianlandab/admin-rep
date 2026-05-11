@@ -13,15 +13,20 @@
     [class.max-md:-translate-x-full]="!mobileNavOpen()"
   >
     <app-app-sidebar
-      [items]="navItems"
+      [sections]="navSections"
+      [user]="shellUser"
       [collapsed]="sidebarCollapsed()"
       (closeMobile)="closeMobileNav()"
-      (toggleCollapse)="toggleSidebarCollapsed()"
     />
   </div>
 
   <div class="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-background">
-    <app-app-topbar class="shrink-0" (menuClick)="openMobileNav()" />
+    <app-app-topbar
+      class="shrink-0"
+      [collapsed]="sidebarCollapsed()"
+      (menuClick)="openMobileNav()"
+      (toggleSidebar)="toggleSidebarCollapsed()"
+    />
     <main class="rep-page-spacing rep-scroll-area min-h-0 flex-1 bg-background">
       <router-outlet />
     </main>

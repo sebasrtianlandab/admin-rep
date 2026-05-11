@@ -1,26 +1,25 @@
-import { Component, input, output } from '@angular/core';
-import { ThemeService } from '@core/theme/theme.service';
-import { APP_SETTINGS } from '@core/config/app-settings';
+import { Component, ElementRef, HostListener, inject, input, output, signal } from '@angular/core';
+import { ThemeMode, ThemeService } from '@core/theme/theme.service';
 import { RepIconsModule } from '@shared/ui/icons/rep-icons.module';
-import {
-  RepBreadcrumbComponent,
-  RepBreadcrumbItem,
-} from '@shared/ui/navigation/rep-breadcrumb/rep-breadcrumb.component';
 
 @Component({
   selector: 'app-app-topbar',
-  imports: [RepIconsModule, RepBreadcrumbComponent],
+  imports: [RepIconsModule],
   templateUrl: './app-topbar.component.html',
   styleUrl: './app-topbar.component.scss',
 })
 export class AppTopbarComponent {
-  readonly menuClick = output<void>();
-  readonly breadcrumbItems = input<RepBreadcrumbItem[]>([
-    { label: 'Inicio', link: '/dashboard' },
-    { label: 'Panel', link: '/dashboard' },
-  ]);
+  private readonly host = inject(ElementRef<HTMLElement>);
 
-  readonly brand = APP_SETTINGS;
+  readonly menuClick = output<void>();
+  readonly toggleSidebar = output<void>();
+  readonly collapsed = input(false);
+  readonly themeMenuOpen = signal(false);
+  readonly themeOptions: ReadonlyArray<{ value: ThemeMode; label: string; icon: string }> = [
+    { value: 'light', label: 'Claro', icon: 'sun' },
+    { value: 'dark', label: 'Oscuro', icon: 'moon' },
+    { value: 'system', label: 'Sistema', icon: 'monitor' },
+  ];
 
   constructor(readonly theme: ThemeService) {}
 
@@ -28,7 +27,34 @@ export class AppTopbarComponent {
     this.menuClick.emit();
   }
 
-  onToggleTheme(): void {
-    this.theme.toggle();
+  onToggleSidebar(): void {
+    this.toggleSidebar.emit();
+  }
+
+  toggleThemeMenu(): void {
+    this.themeMenuOpen.update((open) => !open);
+  }
+
+  setTheme(mode: ThemeMode): void {
+    this.theme.setMode(mode);
+    this.themeMenuOpen.set(false);
+  }
+
+  themeIcon(): string {
+    const mode = this.theme.mode();
+    if (mode === 'system') return 'monitor';
+    return mode === 'dark' ? 'moon' : 'sun';
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    if (!this.themeMenuOpen()) return;
+    if (this.host.nativeElement.contains(event.target as Node | null)) return;
+    this.themeMenuOpen.set(false);
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscapeKey(): void {
+    this.themeMenuOpen.set(false);
   }
 }

@@ -8,16 +8,28 @@
       <app-rep-page-header
         eyebrow="Comercial"
         title="Monetización"
-        description="Planes, paquetes, créditos y reglas de destacados. Cambios sensibles: confirmación y auditoría en fases posteriores."
+        description="Gestiona pricing, límites y copy comercial desde una superficie de settings con pestañas y contexto de planes."
       />
     </div>
-    <div class="flex shrink-0 items-center gap-2">
+    <div class="parameters-shell__actions">
       @if (data(); as d) {
-        <app-rep-badge variant="outline" [label]="'Mock · ' + (d.generatedAt | date : 'medium')" />
+        <div class="parameters-shell__meta">
+          <app-rep-badge variant="outline" [label]="'Editó · ' + d.audit.updatedBy" />
+          <app-rep-badge variant="neutral" [label]="'Últ. modif. · ' + (d.audit.updatedAt | date : 'medium')" />
+          @if (dirty()) {
+            <app-rep-badge variant="warning" label="Cambios sin guardar" />
+          }
+        </div>
       }
-      <app-rep-button variant="outline" size="md" [loading]="loading()" (clicked)="refresh()">
+      <app-rep-button variant="ghost" size="md" [disabled]="!dirty() || saving()" (clicked)="resetDraft()">
+        Cancelar
+      </app-rep-button>
+      <app-rep-button variant="outline" size="md" [loading]="loading()" [disabled]="saving()" (clicked)="refresh()">
         <lucide-icon name="refresh-cw" [size]="16" [class.animate-spin]="loading()" />
-        Actualizar
+        Recargar
+      </app-rep-button>
+      <app-rep-button size="md" [loading]="saving()" [disabled]="!dirty() || !canSave()" (clicked)="save()">
+        Guardar cambios
       </app-rep-button>
     </div>
   </app-rep-toolbar>
@@ -26,30 +38,193 @@
     <app-rep-error-state title="No se pudo cargar la sección" [description]="err" />
   }
 
-  <app-rep-section ariaLabel="Resumen comercial">
-    <div class="parameters-shell__grid">
-      @if (loading() && !data()) {
-        <app-rep-card title="Cargando…" [compact]="true" [padding]="'sm'">
-          <p class="rep-muted-text rep-caption">Obteniendo snapshot mock.</p>
-        </app-rep-card>
-      } @else {
-        @if (data(); as x) {
-          <app-rep-card title="Planes" [compact]="true" [padding]="'sm'">
-            <dl class="parameters-shell__dl">
-              <dt>Planes activos</dt>
-              <dd>{{ x.activePlans }}</dd>
-              <dt>Moneda base</dt>
-              <dd>{{ x.currency }}</dd>
-            </dl>
+  <app-rep-section ariaLabel="Editor de monetización">
+    @if (draft(); as draft) {
+      <div class="parameters-shell__layout">
+        <div class="parameters-shell__main">
+          <app-rep-card title="Settings comerciales" subtitle="Pestañas por dominio funcional" [padding]="'sm'">
+            <app-rep-tabs [(value)]="activeTab" [tabs]="tabs" />
+
+            @switch (activeTab()) {
+              @case ('general') {
+                <div class="parameters-shell__form-grid">
+                  <app-rep-input
+                    label="Moneda base"
+                    [disabled]="saving()"
+                    [error]="draft.general.defaultCurrency.trim() === '' ? 'La moneda es obligatoria.' : null"
+                    [value]="draft.general.defaultCurrency"
+                    (valueChange)="patchGroup('general', 'defaultCurrency', $event)"
+                  />
+                  <app-rep-input
+                    label="Etiqueta ciclo"
+                    [disabled]="saving()"
+                    [value]="draft.general.billingCycleLabel"
+                    (valueChange)="patchGroup('general', 'billingCycleLabel', $event)"
+                  />
+                  <app-rep-switch
+                    label="Impuestos incluidos"
+                    [disabled]="saving()"
+                    [checked]="draft.general.taxesIncluded"
+                    (checkedChange)="patchGroup('general', 'taxesIncluded', $event)"
+                  />
+                  <app-rep-switch
+                    label="Autoservicio habilitado"
+                    [disabled]="saving()"
+                    [checked]="draft.general.selfServeEnabled"
+                    (checkedChange)="patchGroup('general', 'selfServeEnabled', $event)"
+                  />
+                </div>
+              }
+
+              @case ('pricing') {
+                <div class="parameters-shell__form-grid">
+                  <app-rep-input
+                    label="Precio destacado"
+                    [disabled]="saving()"
+                    [value]="draft.pricing.featuredPrice"
+                    (valueChange)="patchGroup('pricing', 'featuredPrice', $event)"
+                  />
+                  <app-rep-input
+                    label="Multiplicador premium"
+                    [disabled]="saving()"
+                    [value]="draft.pricing.premiumMultiplier"
+                    (valueChange)="patchGroup('pricing', 'premiumMultiplier', $event)"
+                  />
+                  <app-rep-input
+                    label="Descuento renovación"
+                    [disabled]="saving()"
+                    [value]="draft.pricing.renewalDiscount"
+                    (valueChange)="patchGroup('pricing', 'renewalDiscount', $event)"
+                  />
+                </div>
+              }
+
+              @case ('limits') {
+                <div class="parameters-shell__form-grid">
+                  <app-rep-input
+                    label="Publicaciones gratis"
+                    type="number"
+                    [disabled]="saving()"
+                    [value]="asText(draft.limits.freePublications)"
+                    (valueChange)="patchGroup('limits', 'freePublications', asNumber($event))"
+                  />
+                  <app-rep-input
+                    label="Publicaciones premium"
+                    type="number"
+                    [disabled]="saving()"
+                    [value]="asText(draft.limits.premiumPublications)"
+                    (valueChange)="patchGroup('limits', 'premiumPublications', asNumber($event))"
+                  />
+                  <app-rep-input
+                    label="Máx. destacados"
+                    type="number"
+                    [disabled]="saving()"
+                    [value]="asText(draft.limits.maxHighlights)"
+                    (valueChange)="patchGroup('limits', 'maxHighlights', asNumber($event))"
+                  />
+                </div>
+              }
+
+              @case ('credits') {
+                <div class="parameters-shell__form-grid">
+                  <app-rep-input
+                    label="Créditos mensuales"
+                    type="number"
+                    [disabled]="saving()"
+                    [value]="asText(draft.credits.monthlyCredits)"
+                    (valueChange)="patchGroup('credits', 'monthlyCredits', asNumber($event))"
+                  />
+                  <app-rep-input
+                    label="Rollover (días)"
+                    type="number"
+                    [disabled]="saving()"
+                    [value]="asText(draft.credits.rolloverDays)"
+                    (valueChange)="patchGroup('credits', 'rolloverDays', asNumber($event))"
+                  />
+                  <app-rep-input
+                    label="Etiqueta bonus"
+                    [disabled]="saving()"
+                    [value]="draft.credits.bonusPackLabel"
+                    (valueChange)="patchGroup('credits', 'bonusPackLabel', $event)"
+                  />
+                </div>
+              }
+
+              @case ('marketing') {
+                <div class="parameters-shell__group">
+                  <app-rep-input
+                    label="Headline"
+                    [disabled]="saving()"
+                    [error]="draft.marketing.headline.trim() === '' ? 'El headline es obligatorio.' : null"
+                    [value]="draft.marketing.headline"
+                    (valueChange)="patchGroup('marketing', 'headline', $event)"
+                  />
+                  <app-rep-textarea
+                    label="Subtitle"
+                    [rows]="3"
+                    [disabled]="saving()"
+                    [value]="draft.marketing.subtitle"
+                    (valueChange)="patchGroup('marketing', 'subtitle', $event)"
+                  />
+                  <app-rep-input
+                    label="CTA"
+                    [disabled]="saving()"
+                    [value]="draft.marketing.cta"
+                    (valueChange)="patchGroup('marketing', 'cta', $event)"
+                  />
+                </div>
+              }
+            }
           </app-rep-card>
-          <app-rep-card title="Créditos y uso" [compact]="true" [padding]="'sm'">
-            <p class="rep-caption">{{ x.creditPolicySummary }}</p>
+        </div>
+
+        <div class="parameters-shell__aside">
+          <app-rep-card title="Planes activos" subtitle="Contexto comercial del pricing" [padding]="'sm'">
+            <div class="parameters-shell__stack">
+              @for (plan of draft.plans; track plan.id) {
+                <div class="parameters-shell__summary-card">
+                  <div class="parameters-shell__editable-header">
+                    <div class="parameters-shell__title-block">
+                      <span class="parameters-shell__title">{{ plan.name }}</span>
+                      <span class="parameters-shell__muted rep-caption">{{ plan.headline }}</span>
+                    </div>
+                    <app-rep-badge [variant]="plan.active ? 'success' : 'neutral'" [label]="plan.active ? 'Activo' : 'Inactivo'" />
+                  </div>
+                  <div class="parameters-shell__pill-row">
+                    <app-rep-badge variant="outline" [label]="'€ ' + plan.price + ' / ' + plan.interval" />
+                    <app-rep-badge variant="neutral" [label]="plan.featuredSlots + ' destacados'" />
+                    <app-rep-badge variant="neutral" [label]="plan.creditPack + ' créditos'" />
+                  </div>
+                </div>
+              }
+            </div>
           </app-rep-card>
-          <app-rep-card title="Destacados comerciales" [compact]="true" [padding]="'sm'">
-            <p class="rep-caption">{{ x.highlightSummary }}</p>
+
+          <app-rep-card title="Preview comercial" subtitle="Cómo se vería la propuesta actual" [padding]="'sm'">
+            <div class="parameters-shell__preview-surface">
+              <strong>{{ draft.marketing.headline }}</strong>
+              <p class="parameters-shell__muted rep-caption">{{ draft.marketing.subtitle }}</p>
+              <div class="parameters-shell__cta-row">
+                <span class="parameters-shell__mini-button parameters-shell__mini-button--primary">
+                  {{ draft.marketing.cta }}
+                </span>
+              </div>
+              <dl class="parameters-shell__dl">
+                <dt>Moneda</dt>
+                <dd>{{ draft.general.defaultCurrency }}</dd>
+                <dt>Destacado</dt>
+                <dd>{{ draft.pricing.featuredPrice }}</dd>
+                <dt>Créditos</dt>
+                <dd>{{ draft.credits.monthlyCredits }}</dd>
+              </dl>
+            </div>
           </app-rep-card>
-        }
-      }
-    </div>
+        </div>
+      </div>
+    } @else if (loading()) {
+      <app-rep-card title="Cargando monetización" [padding]="'sm'">
+        <p class="rep-muted-text rep-caption">Preparando el editor comercial.</p>
+      </app-rep-card>
+    }
   </app-rep-section>
 </app-rep-page-container>

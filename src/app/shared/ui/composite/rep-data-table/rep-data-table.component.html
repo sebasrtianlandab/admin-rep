@@ -7,6 +7,57 @@
   <div class="rep-table__chrome">
     <ng-content select="[repTableToolbar]" />
     <div class="rep-table__header-actions">
+      @if (canExport()) {
+        <div class="rep-table__export">
+          <app-rep-button variant="outline" size="sm" [disabled]="!!exportLoading()" (clicked)="toggleExportMenu()">
+            <lucide-icon name="download" [size]="16" />
+            Exportar
+            <lucide-icon name="chevron-down" [size]="16" />
+          </app-rep-button>
+
+          @if (exportMenuOpen()) {
+            <div class="rep-table__export-menu" role="menu" aria-label="Opciones de exportación">
+              <button
+                type="button"
+                class="rep-table__export-option"
+                [disabled]="!!exportLoading()"
+                (click)="exportTable('pdf')"
+              >
+                <div class="rep-table__export-copy">
+                  <strong>PDF</strong>
+                  <span class="rep-caption rep-muted-text">Documento listo para compartir</span>
+                </div>
+                <lucide-icon name="file-text" [size]="16" />
+              </button>
+              <button
+                type="button"
+                class="rep-table__export-option"
+                [disabled]="!!exportLoading()"
+                (click)="exportTable('excel')"
+              >
+                <div class="rep-table__export-copy">
+                  <strong>Excel</strong>
+                  <span class="rep-caption rep-muted-text">Hoja editable para operaciones</span>
+                </div>
+                <lucide-icon name="file-spreadsheet" [size]="16" />
+              </button>
+              <button
+                type="button"
+                class="rep-table__export-option"
+                [disabled]="!!exportLoading()"
+                (click)="exportTable('csv')"
+              >
+                <div class="rep-table__export-copy">
+                  <strong>CSV</strong>
+                  <span class="rep-caption rep-muted-text">Formato plano para importaciones</span>
+                </div>
+                <lucide-icon name="file-text" [size]="16" />
+              </button>
+            </div>
+          }
+        </div>
+      }
+
       <ng-content select="[repTableHeaderActions]" />
     </div>
   </div>

@@ -29,56 +29,88 @@
     <app-rep-error-state title="No se pudo cargar el módulo" [description]="err" />
   }
 
-  <app-rep-section [ariaLabel]="'Indicadores'">
-    <div class="rep-grid-kpi">
-      @if (loading() && !snapshot()) {
-        @for (i of [1, 2, 3, 4]; track i) {
-          <app-rep-kpi-card label="…" value="—" [loading]="true" iconName="sliders-horizontal" />
-        }
-      } @else {
-        @if (snapshot(); as snap) {
-          @for (k of snap.kpis; track k.id) {
-            <app-rep-kpi-card
-              [label]="k.label"
-              [value]="k.value"
-              [hint]="k.hint"
-              [iconName]="k.icon"
-              [trendLabel]="k.trendLabel"
-              [trendPositive]="k.trendPositive"
+  <app-rep-section [ariaLabel]="'Inventario técnico'">
+    <div class="parameters-advanced__layout">
+      <app-rep-card
+        title="Variables y flags"
+        subtitle="La única superficie técnica del módulo Parámetros"
+        [padding]="'sm'"
+      >
+        <app-rep-table-toolbar>
+          <div repTableToolbarStart class="min-w-0 flex-1">
+            <app-rep-filter-bar
+              [(search)]="search"
+              searchPlaceholder="Buscar clave o ámbito…"
+              [resetDisabled]="search().trim() === ''"
+              (reset)="onFilterReset()"
             />
-          }
+          </div>
+        </app-rep-table-toolbar>
+        <app-rep-data-table
+          [columns]="columns"
+          [rows]="filteredRows()"
+          [loading]="loading() && !snapshot()"
+          exportFileName="parametros-configuracion-avanzada"
+          exportTitle="Parámetros · Configuración avanzada"
+          [emptyMode]="emptyMode()"
+          emptyMessage="Sin filas en el mock."
+          emptyDescription="Los cambios requerirán confirmación fuerte y bitácora."
+          [density]="'comfortable'"
+          [paginationEnabled]="true"
+          [pageSize]="6"
+          [rowActions]="advancedActions"
+        />
+
+        <ng-template #advancedActions let-row>
+          <app-rep-button variant="ghost" size="sm" (clicked)="selectRow(rowId(row))">
+            Ver
+          </app-rep-button>
+        </ng-template>
+      </app-rep-card>
+
+      <div class="parameters-advanced__aside">
+        @if (selectedRow(); as row) {
+          <app-rep-card title="Inspector" subtitle="Contexto, riesgo y acción recomendada" [padding]="'sm'">
+            <div class="parameters-advanced__stack">
+              <div class="parameters-advanced__meta">
+                <app-rep-badge variant="outline" [label]="rowText(row, 'scope')" />
+                <app-rep-badge [variant]="rowRiskVariant(row)" [label]="'Riesgo · ' + rowText(row, 'risk')" />
+              </div>
+
+              <dl class="parameters-advanced__dl">
+                <dt>Clave</dt>
+                <dd><code>{{ rowText(row, 'key') }}</code></dd>
+                <dt>Tipo</dt>
+                <dd>{{ rowText(row, 'valueType') }}</dd>
+                <dt>Origen</dt>
+                <dd>{{ rowText(row, 'source') }}</dd>
+                <dt>Preview</dt>
+                <dd>{{ rowText(row, 'preview') }}</dd>
+                <dt>Última modif.</dt>
+                <dd>{{ rowText(row, 'changed') }}</dd>
+              </dl>
+
+              <div class="parameters-advanced__surface">
+                <strong>Recomendación</strong>
+                <p class="rep-caption parameters-advanced__muted">
+                  Ejecuta cambios desde un flujo controlado, con permisos elevados y bitácora de auditoría.
+                </p>
+                <app-rep-button variant="outline" size="md" (clicked)="openConfirm()">
+                  Solicitar cambio sensible
+                </app-rep-button>
+              </div>
+            </div>
+          </app-rep-card>
         }
-      }
+      </div>
     </div>
   </app-rep-section>
 
-  <app-rep-section [ariaLabel]="'Inventario técnico'">
-    <app-rep-card
-      title="Variables y flags"
-      subtitle="Tabla mock · permisos y auditoría en fases siguientes"
-      [padding]="'sm'"
-    >
-      <app-rep-table-toolbar>
-        <div repTableToolbarStart class="min-w-0 flex-1">
-          <app-rep-filter-bar
-            [(search)]="search"
-            searchPlaceholder="Buscar clave o ámbito…"
-            [resetDisabled]="search().trim() === ''"
-            (reset)="onFilterReset()"
-          />
-        </div>
-      </app-rep-table-toolbar>
-      <app-rep-data-table
-        [columns]="columns"
-        [rows]="filteredRows()"
-        [loading]="loading() && !snapshot()"
-        [emptyMode]="emptyMode()"
-        emptyMessage="Sin filas en el mock."
-        emptyDescription="Los cambios requerirán confirmación fuerte y bitácora."
-        [density]="'comfortable'"
-        [paginationEnabled]="true"
-        [pageSize]="8"
-      />
-    </app-rep-card>
-  </app-rep-section>
+  <app-rep-confirm-dialog
+    [(open)]="confirmOpen"
+    titleText="Cambio sensible"
+    messageText="Este ajuste pertenece a la capa técnica avanzada. En la integración real exigiría permisos especiales, confirmación fuerte y auditoría."
+    confirmLabel="Entendido"
+    cancelLabel="Cerrar"
+  />
 </app-rep-page-container>

@@ -3,7 +3,7 @@
     <app-rep-page-header
       eyebrow="Producto"
       title="Parámetros"
-      description="Centro de configuración del marketplace: contenido público, branding, operación comercial e integraciones. Use Avanzado solo para flags, secretos y variables internas."
+      description="Áreas de configuración del producto: contenido, identidad, marketplace, monetización, SEO, integraciones, catálogos y ajustes avanzados."
     />
     <div class="flex shrink-0 items-center gap-2">
       @if (snapshot(); as snap) {
@@ -23,39 +23,79 @@
     <app-rep-error-state title="No se pudo cargar el hub" [description]="err" />
   }
 
-  <app-rep-section ariaLabel="Áreas de configuración">
+  <app-rep-section
+    ariaLabel="Áreas a configurar"
+    title="Áreas a configurar"
+    subtitle="Selecciona una sección para administrar su configuración."
+  >
     <div class="parameters-hub__grid">
       @if (loading() && !snapshot()) {
-        @for (i of [1, 2, 3, 4, 5, 6, 7, 8]; track i) {
-          <app-rep-card [compact]="true" [padding]="'sm'" title="…" subtitle="Cargando">
+        @for (i of skeletonCards; track i) {
+          <app-rep-card [padding]="'sm'" title="…" subtitle="Cargando">
             <p class="rep-muted-text rep-caption">—</p>
           </app-rep-card>
         }
       } @else {
-        @if (snapshot(); as snap) {
-          @for (card of snap.cards; track trackById($index, card)) {
-            <a class="parameters-hub__card-link" [routerLink]="['/parameters', card.path]">
-              <app-rep-card [compact]="true" [padding]="'sm'" [title]="card.title" [subtitle]="card.description">
-                <div class="parameters-hub__meta">
-                  <lucide-icon class="parameters-hub__icon" [name]="card.icon" [size]="22" />
-                  <div class="parameters-hub__chips">
-                    <app-rep-badge variant="outline" [label]="'Impacto: ' + card.impact" />
-                    <app-rep-badge [variant]="riskVariant(card.risk)" [label]="'Riesgo: ' + card.risk" />
-                    <app-rep-badge
-                      variant="neutral"
-                      [label]="'Última modif. · ' + (card.lastModified | date : 'medium')"
-                    />
-                  </div>
+        @for (card of pagedCards(); track trackById($index, card)) {
+          <a class="parameters-hub__card-link" [routerLink]="routeFor(card)">
+            <app-rep-card [padding]="'sm'">
+              <div repCardHeader class="parameters-hub__custom-header">
+                <div class="parameters-hub__title-wrap">
+                  <h3 class="parameters-hub__title">{{ card.title }}</h3>
+                  <p class="parameters-hub__description">{{ card.description }}</p>
                 </div>
-                <div repCardFooter class="parameters-hub__footer">
-                  <span class="parameters-hub__cta">Abrir sección</span>
+              </div>
+
+              <div class="parameters-hub__card-head">
+                <span
+                  class="parameters-hub__icon-tile"
+                  [class.parameters-hub__icon-tile--platform]="isPlatformCard(card)"
+                >
+                  <lucide-icon class="parameters-hub__icon" [name]="card.icon" [size]="18" />
+                </span>
+                <div class="parameters-hub__chips">
+                  <app-rep-badge variant="outline" [label]="card.category" />
+                  <app-rep-badge variant="neutral" [label]="card.audience" />
+                </div>
+              </div>
+
+              <div class="parameters-hub__meta-list">
+                <div class="parameters-hub__meta-row">
+                  <span class="parameters-hub__meta-label">Última modificación</span>
+                  <span class="parameters-hub__meta-value">{{ card.lastModified | date : 'medium' }}</span>
+                </div>
+              </div>
+
+              <div repCardFooter class="parameters-hub__footer">
+                <span class="parameters-hub__cta">
+                  Abrir configuración
                   <lucide-icon name="chevron-right" [size]="16" />
-                </div>
-              </app-rep-card>
-            </a>
-          }
+                </span>
+              </div>
+            </app-rep-card>
+          </a>
         }
       }
     </div>
+
+    @if (!loading() && totalPages() > 1) {
+      <div class="parameters-hub__pager">
+        <span class="parameters-hub__pager-text">Mostrando {{ pageRangeLabel() }}</span>
+        <div class="parameters-hub__pager-actions">
+          <app-rep-button variant="ghost" size="md" [disabled]="pageIndex() === 0" (clicked)="previousPage()">
+            Anterior
+          </app-rep-button>
+          <app-rep-badge variant="outline" [label]="'Página ' + (pageIndex() + 1) + ' de ' + totalPages()" />
+          <app-rep-button
+            variant="outline"
+            size="md"
+            [disabled]="pageIndex() >= totalPages() - 1"
+            (clicked)="nextPage()"
+          >
+            Siguiente
+          </app-rep-button>
+        </div>
+      </div>
+    }
   </app-rep-section>
 </app-rep-page-container>

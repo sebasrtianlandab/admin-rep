@@ -27,11 +27,20 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
+  /* Ensure controls inherit the global UI font pairing from `body`. */
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+  }
+
   app-root {
     display: block;
     min-height: 100dvh;
   }
 
+  /* Reserved for page titles / editorial headings only. */
   .font-display {
     font-family: var(--font-display);
   }

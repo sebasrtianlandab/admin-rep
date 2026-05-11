@@ -76,6 +76,8 @@
         [rows]="filteredRows()"
         [rowActions]="userRowActions"
         [loading]="loading() && !snapshot()"
+        exportFileName="usuarios-admin"
+        exportTitle="Usuarios"
         [emptyMode]="emptyMode()"
         emptyMessage="No hay usuarios en el mock."
         emptyDescription="Cuando exista API admin, aquí aparecerán todas las cuentas."

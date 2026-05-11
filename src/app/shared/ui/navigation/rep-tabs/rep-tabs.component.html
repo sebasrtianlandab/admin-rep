@@ -1,0 +1,17 @@
+<div class="rep-tabs" role="tablist" aria-label="Pestañas">
+  @for (tab of tabs(); track tab.id) {
+    <button
+      type="button"
+      role="tab"
+      class="rep-tabs__tab"
+      [class.rep-tabs__tab--active]="value() === tab.id"
+      [attr.aria-selected]="value() === tab.id"
+      (click)="select(tab.id)"
+    >
+      <span class="rep-tabs__label">{{ tab.label }}</span>
+      @if (tab.description) {
+        <span class="rep-tabs__desc rep-caption">{{ tab.description }}</span>
+      }
+    </button>
+  }
+</div>

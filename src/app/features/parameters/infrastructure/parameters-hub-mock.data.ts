@@ -7,6 +7,8 @@ export function buildParametersHubSnapshot(): ParametersHubSnapshot {
       {
         id: 'home',
         path: 'home',
+        category: 'Contenido',
+        audience: 'Marketing y producto',
         title: 'Inicio y contenido público',
         description:
           'Hero, CTAs, FAQs, banners, testimonios y bloques de la landing. Pensado para marketing y producto.',
@@ -18,6 +20,8 @@ export function buildParametersHubSnapshot(): ParametersHubSnapshot {
       {
         id: 'branding',
         path: 'branding',
+        category: 'Identidad',
+        audience: 'Brand y diseño',
         title: 'Branding',
         description: 'Logos, favicon, paleta, modo oscuro y textos institucionales.',
         impact: 'Alto en reconocimiento visual',
@@ -28,6 +32,8 @@ export function buildParametersHubSnapshot(): ParametersHubSnapshot {
       {
         id: 'marketplace',
         path: 'marketplace',
+        category: 'Operación',
+        audience: 'Marketplace ops',
         title: 'Marketplace',
         description:
           'Estados de publicación, badges, destacados, moderación y límites operativos del catálogo.',
@@ -39,6 +45,8 @@ export function buildParametersHubSnapshot(): ParametersHubSnapshot {
       {
         id: 'monetization',
         path: 'monetization',
+        category: 'Revenue',
+        audience: 'Comercial y finanzas',
         title: 'Monetización',
         description: 'Planes, paquetes, créditos, destacados comerciales y reglas de uso.',
         impact: 'Crítico en ingresos',
@@ -49,6 +57,8 @@ export function buildParametersHubSnapshot(): ParametersHubSnapshot {
       {
         id: 'seo',
         path: 'seo',
+        category: 'Adquisición',
+        audience: 'SEO y growth',
         title: 'SEO y marketing',
         description: 'Metadatos por defecto, Open Graph, sitemap y vistas previas SERP.',
         impact: 'Alto en descubrimiento orgánico',
@@ -59,6 +69,8 @@ export function buildParametersHubSnapshot(): ParametersHubSnapshot {
       {
         id: 'integrations',
         path: 'integrations',
+        category: 'Conectores',
+        audience: 'Operaciones técnicas',
         title: 'Integraciones',
         description: 'SMTP, medios, mapas, pasarelas y APIs externas.',
         impact: 'Alto en continuidad operativa',
@@ -69,6 +81,8 @@ export function buildParametersHubSnapshot(): ParametersHubSnapshot {
       {
         id: 'catalogs',
         path: 'catalogs',
+        category: 'Maestros',
+        audience: 'Data stewardship',
         title: 'Catálogos',
         description: 'Tipos, monedas, categorías y referencias maestras versionadas.',
         impact: 'Medio en consistencia de datos',
@@ -79,6 +93,8 @@ export function buildParametersHubSnapshot(): ParametersHubSnapshot {
       {
         id: 'advanced',
         path: 'advanced',
+        category: 'Plataforma',
+        audience: 'Permisos elevados',
         title: 'Configuración avanzada',
         description:
           'Feature flags técnicos, variables internas, secretos enmascarados y ajustes low-level.',

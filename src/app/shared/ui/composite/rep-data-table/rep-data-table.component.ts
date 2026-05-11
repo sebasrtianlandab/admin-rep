@@ -1,11 +1,24 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { Component, computed, effect, input, model, signal, TemplateRef } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  HostListener,
+  computed,
+  effect,
+  inject,
+  input,
+  model,
+  signal,
+  TemplateRef,
+} from '@angular/core';
 import type { RepBadgeVariant } from '@shared/ui/primitives/rep-badge/rep-badge.component';
 import { RepBadgeComponent } from '@shared/ui/primitives/rep-badge/rep-badge.component';
 import { RepButtonComponent } from '@shared/ui/primitives/rep-button/rep-button.component';
 import { RepEmptyStateComponent } from '@shared/ui/feedback/rep-empty-state/rep-empty-state.component';
 import { RepIconsModule } from '@shared/ui/icons/rep-icons.module';
 import { RepSkeletonComponent } from '@shared/ui/primitives/rep-skeleton/rep-skeleton.component';
+import { RepDataExportService } from '@shared/utils/data-export/rep-data-export.service';
+import type { RepDataExportFormat } from '@shared/utils/data-export/rep-data-export.models';
 import {
   compareRepCellValues,
   RepTableColumn,
@@ -26,6 +39,9 @@ import {
   styleUrl: './rep-data-table.component.scss',
 })
 export class RepDataTableComponent {
+  private readonly host = inject(ElementRef<HTMLElement>);
+  private readonly exportService = inject(RepDataExportService);
+
   readonly columns = input<RepTableColumn[]>([]);
   readonly rows = input<RepTableRow[]>([]);
   readonly loading = input(false);
@@ -51,9 +67,14 @@ export class RepDataTableComponent {
   readonly paginationEnabled = input(false);
   readonly pageSize = input(10);
   readonly pageIndex = model(0);
+  readonly exportEnabled = input(true);
+  readonly exportFileName = input('tabla');
+  readonly exportTitle = input<string | null>(null);
 
   private readonly sortKey = signal<string | null>(null);
   private readonly sortDir = signal<'asc' | 'desc'>('asc');
+  readonly exportMenuOpen = signal(false);
+  readonly exportLoading = signal<RepDataExportFormat | null>(null);
 
   readonly isCompact = computed(() => {
     const d = this.density();
@@ -103,6 +124,14 @@ export class RepDataTableComponent {
     return `${from}–${to} de ${all}`;
   });
 
+  readonly exportColumns = computed(() =>
+    this.columns().filter((column) => !column.actions && column.cellType !== 'actions' && column.exportable !== false),
+  );
+
+  readonly canExport = computed(
+    () => this.exportEnabled() && !this.loading() && this.sortedRows().length > 0 && this.exportColumns().length > 0,
+  );
+
   constructor() {
     effect(() => {
       const max = this.maxPageIndex();
@@ -116,6 +145,18 @@ export class RepDataTableComponent {
     const v = row[key];
     if (v == null) return '';
     return String(v);
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    if (!this.exportMenuOpen()) return;
+    if (this.host.nativeElement.contains(event.target as Node | null)) return;
+    this.exportMenuOpen.set(false);
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscapeKey(): void {
+    this.exportMenuOpen.set(false);
   }
 
   badgeVariantFor(col: RepTableColumn, row: RepTableRow): RepBadgeVariant {
@@ -148,6 +189,42 @@ export class RepDataTableComponent {
 
   nextPage(): void {
     this.pageIndex.update((i) => Math.min(this.maxPageIndex(), i + 1));
+  }
+
+  toggleExportMenu(): void {
+    if (!this.canExport()) return;
+    this.exportMenuOpen.update((open) => !open);
+  }
+
+  async exportTable(format: RepDataExportFormat): Promise<void> {
+    if (!this.canExport() || this.exportLoading()) return;
+
+    this.exportLoading.set(format);
+
+    try {
+      await this.exportService.export(
+        {
+          fileName: this.exportFileName(),
+          title: this.exportTitle(),
+          columns: this.exportColumns().map((column) => ({
+            key: column.key,
+            label: column.exportLabel ?? column.label,
+          })),
+          rows: this.sortedRows().map((row) =>
+            Object.fromEntries(
+              this.exportColumns().map((column) => [
+                column.key,
+                column.exportValue?.(row) ?? this.cellText(row, column.key),
+              ]),
+            ),
+          ),
+        },
+        format,
+      );
+      this.exportMenuOpen.set(false);
+    } finally {
+      this.exportLoading.set(null);
+    }
   }
 
   emptyTitle(): string {

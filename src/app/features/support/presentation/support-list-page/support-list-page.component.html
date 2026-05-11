@@ -62,6 +62,8 @@
         [columns]="columns"
         [rows]="filteredRows()"
         [loading]="loading() && !snapshot()"
+        exportFileName="soporte-casos"
+        exportTitle="Soporte · Casos"
         [emptyMode]="emptyMode()"
         emptyMessage="Sin casos en el mock."
         emptyDescription="Futuro: `POST /admin/support/cases` y notas internas."

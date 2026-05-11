@@ -2,5 +2,8 @@
 
 :host {
   display: block;
-  @include shell.parameters-shell-layout();
+  height: 100%;
+  min-height: 0;
 }
+
+@include shell.parameters-shell-layout();

@@ -8,16 +8,28 @@
       <app-rep-page-header
         eyebrow="Contenido público"
         title="Inicio y contenido"
-        description="Hero, llamadas a la acción, FAQs y bloques visibles en la landing. Preparado para vista previa y versionado en fases posteriores."
+        description="Edita hero, FAQs y secciones visibles de la landing con una experiencia de configuración y preview, no de inventario."
       />
     </div>
-    <div class="flex shrink-0 items-center gap-2">
+    <div class="parameters-shell__actions">
       @if (data(); as d) {
-        <app-rep-badge variant="outline" [label]="'Mock · ' + (d.generatedAt | date : 'medium')" />
+        <div class="parameters-shell__meta">
+          <app-rep-badge variant="outline" [label]="'Editó · ' + d.audit.updatedBy" />
+          <app-rep-badge variant="neutral" [label]="'Últ. modif. · ' + (d.audit.updatedAt | date : 'medium')" />
+          @if (dirty()) {
+            <app-rep-badge variant="warning" label="Cambios sin guardar" />
+          }
+        </div>
       }
-      <app-rep-button variant="outline" size="md" [loading]="loading()" (clicked)="refresh()">
+      <app-rep-button variant="ghost" size="md" [disabled]="!dirty() || saving()" (clicked)="resetDraft()">
+        Cancelar
+      </app-rep-button>
+      <app-rep-button variant="outline" size="md" [loading]="loading()" [disabled]="saving()" (clicked)="refresh()">
         <lucide-icon name="refresh-cw" [size]="16" [class.animate-spin]="loading()" />
-        Actualizar
+        Recargar
+      </app-rep-button>
+      <app-rep-button size="md" [loading]="saving()" [disabled]="!dirty() || !canSave()" (clicked)="save()">
+        Guardar cambios
       </app-rep-button>
     </div>
   </app-rep-toolbar>
@@ -26,46 +38,258 @@
     <app-rep-error-state title="No se pudo cargar la sección" [description]="err" />
   }
 
-  <app-rep-section ariaLabel="Resumen editorial">
-    <div class="parameters-shell__grid">
-      @if (loading() && !data()) {
-        <app-rep-card title="Cargando…" [compact]="true" [padding]="'sm'">
-          <p class="rep-muted-text rep-caption">Obteniendo snapshot mock.</p>
-        </app-rep-card>
-      } @else {
-        @if (data(); as h) {
-          <app-rep-card title="Hero" subtitle="Mensaje principal sobre la imagen" [compact]="true" [padding]="'sm'">
-            <dl class="parameters-shell__dl">
-              <dt>Antetítulo</dt>
-              <dd>{{ h.heroEyebrow }}</dd>
-              <dt>Título</dt>
-              <dd>{{ h.heroTitle }}</dd>
-              <dt>Subtítulo</dt>
-              <dd>{{ h.heroSubtitle }}</dd>
-              <dt>Imagen</dt>
-              <dd class="rep-muted-text rep-caption">{{ h.heroImagePath }}</dd>
-            </dl>
+  <app-rep-section ariaLabel="Editor de inicio">
+    @if (draft(); as draft) {
+      <div class="parameters-shell__layout">
+        <div class="parameters-shell__main">
+          <app-rep-card
+            title="Hero principal"
+            subtitle="Contenido editable del primer bloque de la home"
+            [padding]="'sm'"
+          >
+            <div class="parameters-shell__form-grid">
+              <app-rep-input
+                label="Eyebrow"
+                [disabled]="saving()"
+                [value]="draft.hero.eyebrow"
+                (valueChange)="patchHero('eyebrow', $event)"
+              />
+              <app-rep-select
+                label="Alineación"
+                [disabled]="saving()"
+                [options]="alignmentOptions"
+                [value]="draft.hero.alignment"
+                (valueChange)="setAlignment($event)"
+              />
+              <app-rep-input
+                label="Título"
+                [disabled]="saving()"
+                [error]="draft.hero.title.trim() === '' ? 'El título es obligatorio.' : null"
+                [value]="draft.hero.title"
+                (valueChange)="patchHero('title', $event)"
+              />
+              <app-rep-input
+                label="Imagen del hero"
+                helperText="Ruta mock del asset. En la integración real se conectará a media storage."
+                [disabled]="saving()"
+                [value]="draft.hero.heroImage"
+                (valueChange)="patchHero('heroImage', $event)"
+              />
+            </div>
+
+            <div class="parameters-shell__group">
+              <app-rep-textarea
+                label="Subtítulo"
+                [rows]="3"
+                [disabled]="saving()"
+                [value]="draft.hero.subtitle"
+                (valueChange)="patchHero('subtitle', $event)"
+              />
+            </div>
+
+            <div class="parameters-shell__form-grid">
+              <app-rep-input
+                label="CTA primaria"
+                [disabled]="saving()"
+                [error]="draft.hero.ctaPrimary.trim() === '' ? 'La CTA primaria es obligatoria.' : null"
+                [value]="draft.hero.ctaPrimary"
+                (valueChange)="patchHero('ctaPrimary', $event)"
+              />
+              <app-rep-input
+                label="CTA secundaria"
+                [disabled]="saving()"
+                [value]="draft.hero.ctaSecondary"
+                (valueChange)="patchHero('ctaSecondary', $event)"
+              />
+            </div>
+
+            <div class="parameters-shell__form-grid">
+              <app-rep-switch
+                label="Overlay habilitado"
+                helperText="Aumenta contraste sobre la imagen del hero."
+                [disabled]="saving()"
+                [checked]="draft.hero.overlayEnabled"
+                (checkedChange)="patchHero('overlayEnabled', $event)"
+              />
+              <app-rep-switch
+                label="Sección habilitada"
+                helperText="Permite ocultar la cabecera principal sin tocar código."
+                [disabled]="saving()"
+                [checked]="draft.hero.enabled"
+                (checkedChange)="patchHero('enabled', $event)"
+              />
+            </div>
           </app-rep-card>
-          <app-rep-card title="Llamadas a la acción" [compact]="true" [padding]="'sm'">
-            <dl class="parameters-shell__dl">
-              <dt>Primaria</dt>
-              <dd>{{ h.ctaPrimary }}</dd>
-              <dt>Secundaria</dt>
-              <dd>{{ h.ctaSecondary }}</dd>
-            </dl>
+
+          <app-rep-card
+            title="FAQs"
+            subtitle="Lista editable, con orden manual y control de visibilidad"
+            [padding]="'sm'"
+          >
+            <div class="parameters-shell__stack">
+              @for (faq of draft.faqs; track faq.id) {
+                <div class="parameters-shell__editable-item">
+                  <div class="parameters-shell__editable-header">
+                    <div class="parameters-shell__title-block">
+                      <span class="parameters-shell__title">{{ faq.question }}</span>
+                      <span class="parameters-shell__muted rep-caption">Item editable del acordeón público</span>
+                    </div>
+                    <div class="parameters-shell__editor-actions">
+                      <app-rep-button variant="ghost" size="sm" [disabled]="saving()" (clicked)="moveFaq(faq.id, -1)">
+                        <lucide-icon name="chevron-up" [size]="14" />
+                      </app-rep-button>
+                      <app-rep-button variant="ghost" size="sm" [disabled]="saving()" (clicked)="moveFaq(faq.id, 1)">
+                        <lucide-icon name="chevron-down" [size]="14" />
+                      </app-rep-button>
+                      <app-rep-button variant="ghost" size="sm" [disabled]="saving()" (clicked)="removeFaq(faq.id)">
+                        <lucide-icon name="x" [size]="14" />
+                      </app-rep-button>
+                    </div>
+                  </div>
+
+                  <div class="parameters-shell__form-grid parameters-shell__form-grid--single">
+                    <app-rep-input
+                      label="Pregunta"
+                      [disabled]="saving()"
+                      [value]="faq.question"
+                      (valueChange)="patchFaq(faq.id, { question: $event })"
+                    />
+                    <app-rep-textarea
+                      label="Respuesta"
+                      [rows]="3"
+                      [disabled]="saving()"
+                      [value]="faq.answer"
+                      (valueChange)="patchFaq(faq.id, { answer: $event })"
+                    />
+                  </div>
+
+                  <app-rep-switch
+                    label="Visible en home"
+                    [disabled]="saving()"
+                    [checked]="faq.enabled"
+                    (checkedChange)="patchFaq(faq.id, { enabled: $event })"
+                  />
+                </div>
+              }
+
+              <div class="parameters-shell__editor-actions">
+                <app-rep-button variant="outline" size="md" [disabled]="saving()" (clicked)="addFaq()">
+                  Agregar FAQ
+                </app-rep-button>
+              </div>
+            </div>
           </app-rep-card>
-          <app-rep-card title="FAQs y listados" [compact]="true" [padding]="'sm'">
-            <dl class="parameters-shell__dl">
-              <dt>Ítems FAQ</dt>
-              <dd>{{ h.faqItemsCount }}</dd>
-              <dt>Límite destacados (home)</dt>
-              <dd>{{ h.featuredStripLimit }}</dd>
-              <dt>Tira “últimas”</dt>
-              <dd>{{ h.latestStripLimit }}</dd>
-            </dl>
+
+          <app-rep-card
+            title="Secciones de la landing"
+            subtitle="Orden, límites y copy de cada bloque configurable"
+            [padding]="'sm'"
+          >
+            <div class="parameters-shell__stack">
+              @for (section of orderedSections(); track section.id) {
+                <div class="parameters-shell__editable-item">
+                  <div class="parameters-shell__editable-header">
+                    <div class="parameters-shell__title-block">
+                      <span class="parameters-shell__title">{{ section.label }}</span>
+                      <span class="parameters-shell__muted rep-caption">Bloque configurable de home</span>
+                    </div>
+                    <app-rep-switch
+                      label="Visible"
+                      [disabled]="saving()"
+                      [checked]="section.enabled"
+                      (checkedChange)="patchSection(section.id, { enabled: $event })"
+                    />
+                  </div>
+
+                  <div class="parameters-shell__form-grid">
+                    <app-rep-input
+                      label="Orden"
+                      type="number"
+                      [disabled]="saving()"
+                      [value]="asText(section.order)"
+                      (valueChange)="patchSection(section.id, { order: asNumber($event) })"
+                    />
+                    <app-rep-input
+                      label="Límite"
+                      type="number"
+                      [disabled]="saving()"
+                      [value]="asText(section.limit)"
+                      (valueChange)="patchSection(section.id, { limit: asNumber($event) })"
+                    />
+                  </div>
+
+                  <app-rep-textarea
+                    label="Copy operacional"
+                    [rows]="2"
+                    [disabled]="saving()"
+                    [value]="section.copy"
+                    (valueChange)="patchSection(section.id, { copy: $event })"
+                  />
+                </div>
+              }
+            </div>
           </app-rep-card>
-        }
-      }
-    </div>
+        </div>
+
+        <div class="parameters-shell__aside">
+          <app-rep-card title="Vista previa" subtitle="Simulación del portal público" [padding]="'sm'">
+            <div class="parameters-shell__preview">
+              <div class="parameters-shell__hero">
+                @if (draft.hero.enabled) {
+                  <app-rep-badge variant="outline" [label]="draft.hero.eyebrow || 'Eyebrow'" />
+                  <div class="parameters-shell__title-block">
+                    <span class="parameters-shell__title">{{ draft.hero.title || 'Título del hero' }}</span>
+                    <span class="parameters-shell__muted">{{ draft.hero.subtitle || 'Subtítulo descriptivo' }}</span>
+                  </div>
+                  <div class="parameters-shell__cta-row">
+                    <span class="parameters-shell__mini-button parameters-shell__mini-button--primary">
+                      {{ draft.hero.ctaPrimary || 'CTA principal' }}
+                    </span>
+                    <span class="parameters-shell__mini-button">
+                      {{ draft.hero.ctaSecondary || 'CTA secundaria' }}
+                    </span>
+                  </div>
+                  <span class="parameters-shell__muted rep-caption">
+                    Imagen · {{ draft.hero.heroImage }} · Alineación {{ draft.hero.alignment }}
+                  </span>
+                } @else {
+                  <p class="parameters-shell__muted rep-caption">El hero está deshabilitado.</p>
+                }
+              </div>
+
+              <div class="parameters-shell__preview-surface">
+                <div class="parameters-shell__title-block">
+                  <span class="parameters-shell__title">FAQs visibles</span>
+                  <span class="parameters-shell__muted rep-caption">{{ enabledFaqs().length }} ítems activos</span>
+                </div>
+                @for (faq of enabledFaqs(); track faq.id) {
+                  <div class="parameters-shell__faq-item">
+                    <strong>{{ faq.question }}</strong>
+                    <p class="rep-caption parameters-shell__muted">{{ faq.answer }}</p>
+                  </div>
+                }
+              </div>
+            </div>
+          </app-rep-card>
+
+          @if (data(); as snapshot) {
+            <app-rep-card title="Auditoría" subtitle="Último cambio registrado en el mock" [padding]="'sm'">
+              <dl class="parameters-shell__dl">
+                <dt>Editor</dt>
+                <dd>{{ snapshot.audit.updatedBy }} · {{ snapshot.audit.editorRole }}</dd>
+                <dt>Resumen</dt>
+                <dd>{{ snapshot.audit.summary }}</dd>
+                <dt>Generado</dt>
+                <dd>{{ snapshot.generatedAt | date : 'medium' }}</dd>
+              </dl>
+            </app-rep-card>
+          }
+        </div>
+      </div>
+    } @else if (loading()) {
+      <app-rep-card title="Cargando editor" [padding]="'sm'">
+        <p class="rep-muted-text rep-caption">Preparando configuración editable de la home.</p>
+      </app-rep-card>
+    }
   </app-rep-section>
 </app-rep-page-container>

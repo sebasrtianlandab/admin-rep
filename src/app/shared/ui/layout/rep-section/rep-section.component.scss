@@ -6,6 +6,12 @@
   margin-bottom: var(--spacing-sm);
 }
 
+.rep-section {
+  display: flex;
+  min-height: 0;
+  flex-direction: column;
+}
+
 .rep-section__title {
   margin: 0;
 }
@@ -16,4 +22,6 @@
 
 .rep-section__body {
   min-width: 0;
+  min-height: 0;
+  flex: 1 1 auto;
 }

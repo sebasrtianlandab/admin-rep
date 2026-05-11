@@ -1,6 +1,10 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { AppSidebarComponent, ShellNavItem } from '@core/layout/app-sidebar/app-sidebar.component';
+import {
+  AppSidebarComponent,
+  ShellNavSection,
+  ShellUserProfile,
+} from '@core/layout/app-sidebar/app-sidebar.component';
 import { AppTopbarComponent } from '@core/layout/app-topbar/app-topbar.component';
 
 @Component({
@@ -16,17 +20,44 @@ export class AppShellComponent {
   readonly mobileNavOpen = signal(false);
   readonly sidebarCollapsed = signal(false);
 
-  readonly navItems: ShellNavItem[] = [
-    { label: 'Panel de control', route: '/dashboard', icon: 'layout-dashboard' },
-    { label: 'Propiedades', route: '/properties', icon: 'building-2' },
-    { label: 'Servicios', route: '/services', icon: 'briefcase' },
-    { label: 'Usuarios', route: '/users', icon: 'users' },
-    { label: 'Empresas', route: '/companies', icon: 'landmark' },
-    { label: 'Pagos', route: '/payments', icon: 'receipt' },
-    { label: 'Soporte', route: '/support', icon: 'life-buoy' },
-    { label: 'Parámetros', route: '/parameters', icon: 'sliders-horizontal' },
-    { label: 'Auditoría', route: '/audit', icon: 'clipboard-list' },
+  readonly navSections: ShellNavSection[] = [
+    {
+      label: 'Principal',
+      items: [{ label: 'Dashboard', route: '/dashboard', icon: 'layout-dashboard' }],
+    },
+    {
+      label: 'Marketplace',
+      items: [
+        { label: 'Propiedades', route: '/properties', icon: 'building-2' },
+        { label: 'Servicios', route: '/services', icon: 'briefcase' },
+      ],
+    },
+    {
+      label: 'Operación',
+      items: [
+        { label: 'Usuarios', route: '/users', icon: 'users' },
+        { label: 'Empresas', route: '/companies', icon: 'landmark' },
+        { label: 'Pagos', route: '/payments', icon: 'receipt' },
+      ],
+    },
+    {
+      label: 'Configuración',
+      items: [{ label: 'Parámetros', route: '/parameters', icon: 'sliders-horizontal' }],
+    },
+    {
+      label: 'Soporte y control',
+      items: [
+        { label: 'Soporte', route: '/support', icon: 'life-buoy' },
+        { label: 'Auditoría', route: '/audit', icon: 'clipboard-list' },
+      ],
+    },
   ];
+
+  readonly shellUser: ShellUserProfile = {
+    name: 'Sebastian Landa',
+    subtitle: 'Asesor inmobiliario',
+    avatarSrc: null,
+  };
 
   openMobileNav(): void {
     this.mobileNavOpen.set(true);

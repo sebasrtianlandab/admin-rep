@@ -5,10 +5,10 @@
 
 :root {
   /* —— Surface hierarchy (ERP) — semantic layers —— */
-  --rep-surface-app: #f0f3f7;
-  --rep-surface-sidebar: #e8f0f8;
+  --rep-surface-app: #fcfcfc;
+  --rep-surface-sidebar: #f2f9ff;
   --rep-surface-card: #ffffff;
-  --rep-surface-elevated: #fafcfd;
+  --rep-surface-elevated: #ffffff;
   --rep-surface-hover: color-mix(in srgb, var(--foreground) 5%, var(--rep-surface-card));
   --rep-surface-active: color-mix(in srgb, var(--primary) 10%, var(--rep-surface-sidebar));
   --rep-surface-overlay: rgb(15 23 42 / 0.42);
@@ -76,8 +76,8 @@
   --table-row-height-compact: 2rem;
   /** @deprecated Use --table-row-height; kept for Tailwind / legacy references */
   --erp-row-height: var(--table-row-height);
-  --rep-sidebar-width: 15rem;
-  --rep-sidebar-width-collapsed: 4rem;
+  --rep-sidebar-width: 16rem;
+  --rep-sidebar-width-collapsed: 3rem;
   /** Altura única de la franja superior: marca del sidebar + topbar (línea inferior alineada). */
   --rep-shell-header-height: 3.5rem;
   --rep-page-padding-x: 1rem;
@@ -91,9 +91,14 @@
   --sidebar: var(--rep-surface-sidebar);
   --sidebar-foreground: #212529;
   --sidebar-primary: #663366;
-  --sidebar-accent: #e8f2fa;
+  --sidebar-accent: #edf7ff;
   --sidebar-border: #d2d1d1;
 
+  /* REP typography lock:
+   * - Display/headings: Lora
+   * - UI/chrome/forms/tables/body: Open Sans
+   * Keep this pairing stable across the whole admin.
+   */
   --font-display: 'Lora', ui-serif, Georgia, serif;
   --font-sans: 'Open Sans', ui-sans-serif, system-ui, sans-serif;
 

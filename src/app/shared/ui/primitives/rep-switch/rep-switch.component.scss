@@ -1,0 +1,86 @@
+:host {
+  display: block;
+}
+
+.rep-switch {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--rep-spacing-md);
+  padding: 0.125rem 0;
+}
+
+.rep-switch--disabled {
+  opacity: 0.6;
+}
+
+.rep-switch__copy {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.rep-switch__label {
+  margin: 0;
+}
+
+.rep-switch__helper {
+  color: var(--muted-foreground);
+}
+
+.rep-switch__control {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.rep-switch__input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.rep-switch__input:disabled {
+  cursor: not-allowed;
+}
+
+.rep-switch__track {
+  display: inline-flex;
+  width: 2.5rem;
+  height: 1.5rem;
+  align-items: center;
+  border-radius: 999px;
+  background: var(--muted);
+  border: 1px solid var(--border);
+  padding: 0.125rem;
+  transition:
+    background-color var(--rep-transition-fast),
+    border-color var(--rep-transition-fast);
+}
+
+.rep-switch__thumb {
+  display: block;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 999px;
+  background: var(--card);
+  box-shadow: var(--rep-shadow-sm);
+  transition: transform var(--rep-transition-fast);
+}
+
+.rep-switch__input:checked + .rep-switch__track {
+  background: color-mix(in srgb, var(--primary) 22%, var(--rep-surface-card));
+  border-color: color-mix(in srgb, var(--primary) 40%, var(--border));
+}
+
+.rep-switch__input:checked + .rep-switch__track .rep-switch__thumb {
+  transform: translateX(1rem);
+  background: var(--primary);
+}
+
+.rep-switch__input:focus-visible + .rep-switch__track {
+  outline: var(--rep-focus-ring);
+  outline-offset: 2px;
+}

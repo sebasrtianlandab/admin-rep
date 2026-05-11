@@ -1,42 +1,52 @@
 <header
-  class="app-topbar flex h-[var(--rep-shell-header-height)] shrink-0 items-center justify-between gap-2 border-b border-sidebar-border bg-sidebar px-3 text-sidebar-foreground md:px-4"
+  class="app-topbar flex h-[var(--rep-shell-header-height)] shrink-0 items-center justify-between gap-3 border-b border-border bg-background px-4 text-foreground"
 >
-  <div class="flex min-w-0 flex-1 items-center gap-2 md:gap-3">
+  <div class="flex min-w-0 flex-1 items-center gap-2">
     <button
       type="button"
-      class="inline-flex size-9 shrink-0 items-center justify-center rounded-md border border-sidebar-border bg-sidebar-accent/80 text-sidebar-foreground md:hidden"
+      class="app-topbar__rail-toggle inline-flex shrink-0 items-center justify-center text-foreground md:hidden"
       (click)="onMenu()"
       aria-label="Abrir menú"
     >
-      <lucide-icon name="menu" class="size-5" />
+      <lucide-icon name="menu" class="size-4" />
     </button>
-    <div class="hidden h-4 w-px shrink-0 bg-sidebar-border md:block" aria-hidden="true"></div>
-    <app-rep-breadcrumb class="hidden min-w-0 md:block" [items]="breadcrumbItems()" />
-    <span
-      class="truncate text-xs font-medium uppercase tracking-wide text-muted-foreground md:hidden"
+    <button
+      type="button"
+      class="app-topbar__rail-toggle hidden shrink-0 items-center justify-center text-foreground transition-colors md:inline-flex"
+      [attr.aria-label]="collapsed() ? 'Expandir barra lateral' : 'Contraer barra lateral'"
+      (click)="onToggleSidebar()"
     >
-      {{ brand.adminProductName }}
-    </span>
+      <lucide-icon [name]="collapsed() ? 'chevrons-right' : 'chevrons-left'" class="size-4" />
+    </button>
+    <div class="h-4 w-px shrink-0 bg-border" aria-hidden="true"></div>
   </div>
 
   <div class="flex shrink-0 items-center gap-2">
-    <span
-      class="app-topbar__env hidden rounded-md border border-sidebar-border bg-sidebar-accent/80 px-2 py-1 font-mono text-[10px] font-semibold uppercase tracking-wider text-muted-foreground sm:inline-block"
-      [attr.title]="'Entorno de demostración'"
-    >
-      {{ brand.environmentLabel }}
-    </span>
-    <button
-      type="button"
-      class="inline-flex size-9 items-center justify-center rounded-md border border-sidebar-border bg-sidebar-accent/80 text-sidebar-foreground transition-colors hover:bg-sidebar-accent"
-      (click)="onToggleTheme()"
-      [attr.aria-label]="theme.dark() ? 'Modo claro' : 'Modo oscuro'"
-    >
-      @if (theme.dark()) {
-        <lucide-icon name="sun" class="size-5" />
-      } @else {
-        <lucide-icon name="moon" class="size-5" />
+    <div class="app-topbar__theme">
+      <button
+        type="button"
+        class="app-topbar__theme-trigger inline-flex items-center justify-center text-foreground transition-colors hover:bg-accent"
+        (click)="toggleThemeMenu()"
+        aria-label="Cambiar tema"
+      >
+        <lucide-icon [name]="themeIcon()" class="size-4" />
+      </button>
+
+      @if (themeMenuOpen()) {
+        <div class="app-topbar__theme-menu" role="menu" aria-label="Selector de tema">
+          @for (option of themeOptions; track option.value) {
+            <button
+              type="button"
+              class="app-topbar__theme-option"
+              [class.app-topbar__theme-option--active]="theme.mode() === option.value"
+              (click)="setTheme(option.value)"
+            >
+              <lucide-icon [name]="option.icon" class="size-4" />
+              <span>{{ option.label }}</span>
+            </button>
+          }
+        </div>
       }
-    </button>
+    </div>
   </div>
 </header>

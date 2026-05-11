@@ -8,16 +8,28 @@
       <app-rep-page-header
         eyebrow="Identidad"
         title="Branding"
-        description="Logos, favicon, tokens de color y textos institucionales. Cambios aquí se reflejan en todo el portal."
+        description="Controla activos, nombres y presets visuales desde un panel de configuración con preview seguro de marca."
       />
     </div>
-    <div class="flex shrink-0 items-center gap-2">
+    <div class="parameters-shell__actions">
       @if (data(); as d) {
-        <app-rep-badge variant="outline" [label]="'Mock · ' + (d.generatedAt | date : 'medium')" />
+        <div class="parameters-shell__meta">
+          <app-rep-badge variant="outline" [label]="'Editó · ' + d.audit.updatedBy" />
+          <app-rep-badge variant="neutral" [label]="'Últ. modif. · ' + (d.audit.updatedAt | date : 'medium')" />
+          @if (dirty()) {
+            <app-rep-badge variant="warning" label="Cambios sin guardar" />
+          }
+        </div>
       }
-      <app-rep-button variant="outline" size="md" [loading]="loading()" (clicked)="refresh()">
+      <app-rep-button variant="ghost" size="md" [disabled]="!dirty() || saving()" (clicked)="resetDraft()">
+        Cancelar
+      </app-rep-button>
+      <app-rep-button variant="outline" size="md" [loading]="loading()" [disabled]="saving()" (clicked)="refresh()">
         <lucide-icon name="refresh-cw" [size]="16" [class.animate-spin]="loading()" />
-        Actualizar
+        Recargar
+      </app-rep-button>
+      <app-rep-button size="md" [loading]="saving()" [disabled]="!dirty() || !canSave()" (clicked)="save()">
+        Guardar cambios
       </app-rep-button>
     </div>
   </app-rep-toolbar>
@@ -26,40 +38,162 @@
     <app-rep-error-state title="No se pudo cargar la sección" [description]="err" />
   }
 
-  <app-rep-section ariaLabel="Identidad visual">
-    <div class="parameters-shell__grid">
-      @if (loading() && !data()) {
-        <app-rep-card title="Cargando…" [compact]="true" [padding]="'sm'">
-          <p class="rep-muted-text rep-caption">Obteniendo snapshot mock.</p>
-        </app-rep-card>
-      } @else {
-        @if (data(); as b) {
-          <app-rep-card title="Marca" [compact]="true" [padding]="'sm'">
-            <dl class="parameters-shell__dl">
-              <dt>Nombre portal</dt>
-              <dd>{{ b.portalName }}</dd>
-              <dt>Línea institucional</dt>
-              <dd>{{ b.institutionalLine }}</dd>
-            </dl>
+  <app-rep-section ariaLabel="Editor de branding">
+    @if (draft(); as draft) {
+      <div class="parameters-shell__layout">
+        <div class="parameters-shell__main">
+          <app-rep-card title="Activos de marca" subtitle="Rutas mock y nombres visibles" [padding]="'sm'">
+            <div class="parameters-shell__form-grid">
+              <app-rep-input
+                label="Logo light"
+                [disabled]="saving()"
+                [value]="draft.logoLight"
+                (valueChange)="patch('logoLight', $event)"
+              />
+              <app-rep-input
+                label="Logo dark"
+                [disabled]="saving()"
+                [value]="draft.logoDark"
+                (valueChange)="patch('logoDark', $event)"
+              />
+              <app-rep-input
+                label="Favicon"
+                [disabled]="saving()"
+                [value]="draft.favicon"
+                (valueChange)="patch('favicon', $event)"
+              />
+              <app-rep-input
+                label="App name"
+                [disabled]="saving()"
+                [error]="draft.appName.trim() === '' ? 'El nombre principal es obligatorio.' : null"
+                [value]="draft.appName"
+                (valueChange)="patch('appName', $event)"
+              />
+              <app-rep-input
+                label="Short name"
+                [disabled]="saving()"
+                [error]="draft.shortName.trim() === '' ? 'El nombre corto es obligatorio.' : null"
+                [value]="draft.shortName"
+                (valueChange)="patch('shortName', $event)"
+              />
+            </div>
           </app-rep-card>
-          <app-rep-card title="Activos gráficos" subtitle="Subidas y variantes" [compact]="true" [padding]="'sm'">
-            <dl class="parameters-shell__dl">
-              <dt>Logo</dt>
-              <dd class="rep-caption">{{ b.logoNote }}</dd>
-              <dt>Favicon</dt>
-              <dd class="rep-caption">{{ b.faviconNote }}</dd>
-            </dl>
+
+          <app-rep-card title="Presets visuales" subtitle="Configuración controlada para no romper el sistema" [padding]="'sm'">
+            <div class="parameters-shell__form-grid">
+              <app-rep-input
+                label="Color primario"
+                [disabled]="saving()"
+                [value]="draft.primaryColor"
+                (valueChange)="patch('primaryColor', $event)"
+              />
+              <app-rep-input
+                label="Color secundario"
+                [disabled]="saving()"
+                [value]="draft.accentColor"
+                (valueChange)="patch('accentColor', $event)"
+              />
+              <app-rep-input
+                label="Color neutral"
+                [disabled]="saving()"
+                [value]="draft.neutralColor"
+                (valueChange)="patch('neutralColor', $event)"
+              />
+              <app-rep-select
+                label="Border radius"
+                [disabled]="saving()"
+                [options]="radiusOptions"
+                [value]="draft.radiusPreset"
+                (valueChange)="setRadiusPreset($event)"
+              />
+              <app-rep-select
+                label="Densidad"
+                [disabled]="saving()"
+                [options]="densityOptions"
+                [value]="draft.densityPreset"
+                (valueChange)="setDensityPreset($event)"
+              />
+            </div>
+
+            <app-rep-textarea
+              label="Texto institucional"
+              [rows]="3"
+              [disabled]="saving()"
+              [value]="draft.institutionalText"
+              (valueChange)="patch('institutionalText', $event)"
+            />
           </app-rep-card>
-          <app-rep-card title="Tokens de color" [compact]="true" [padding]="'sm'">
-            <dl class="parameters-shell__dl">
-              <dt>Primario</dt>
-              <dd><code class="rep-caption">{{ b.primaryToken }}</code></dd>
-              <dt>Secundario / superficie</dt>
-              <dd><code class="rep-caption">{{ b.secondaryToken }}</code></dd>
-            </dl>
+        </div>
+
+        <div class="parameters-shell__aside">
+          <app-rep-card title="Preview de marca" subtitle="Portal light, dark y admin" [padding]="'sm'">
+            <div class="parameters-shell__preview">
+              <div class="parameters-shell__preview-surface">
+                <div class="parameters-shell__pill-row">
+                  <span class="parameters-shell__swatch" [style.background]="draft.primaryColor"></span>
+                  <strong>{{ draft.appName }}</strong>
+                  <app-rep-badge variant="outline" label="Portal light" />
+                </div>
+                <p class="rep-caption parameters-shell__muted">{{ draft.institutionalText }}</p>
+                <div class="parameters-shell__cta-row">
+                  <span class="parameters-shell__mini-button parameters-shell__mini-button--primary">Comprar</span>
+                  <span class="parameters-shell__mini-button">Alquilar</span>
+                </div>
+              </div>
+
+              <div class="parameters-shell__preview-surface parameters-shell__preview-surface--dark">
+                <div class="parameters-shell__pill-row">
+                  <span class="parameters-shell__swatch" [style.background]="draft.accentColor"></span>
+                  <strong>{{ draft.shortName }}</strong>
+                  <app-rep-badge variant="outline" label="Portal dark" />
+                </div>
+                <p class="rep-caption">{{ draft.logoDark }}</p>
+              </div>
+
+              <div class="parameters-shell__preview-surface">
+                <div class="parameters-shell__pill-row">
+                  <app-rep-badge variant="neutral" label="Admin" />
+                  <span class="rep-caption parameters-shell__muted">Densidad {{ draft.densityPreset }}</span>
+                  <span class="rep-caption parameters-shell__muted">Radius {{ draft.radiusPreset }}</span>
+                </div>
+                <div class="parameters-shell__form-grid">
+                  <div class="parameters-shell__summary-card">
+                    <span class="parameters-shell__title">Color primario</span>
+                    <div class="parameters-shell__pill-row">
+                      <span class="parameters-shell__swatch" [style.background]="draft.primaryColor"></span>
+                      <span class="rep-caption">{{ draft.primaryColor }}</span>
+                    </div>
+                  </div>
+                  <div class="parameters-shell__summary-card">
+                    <span class="parameters-shell__title">Color acento</span>
+                    <div class="parameters-shell__pill-row">
+                      <span class="parameters-shell__swatch" [style.background]="draft.accentColor"></span>
+                      <span class="rep-caption">{{ draft.accentColor }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </app-rep-card>
-        }
-      }
-    </div>
+
+          @if (data(); as snapshot) {
+            <app-rep-card title="Auditoría" subtitle="Último cambio guardado" [padding]="'sm'">
+              <dl class="parameters-shell__dl">
+                <dt>Editor</dt>
+                <dd>{{ snapshot.audit.updatedBy }} · {{ snapshot.audit.editorRole }}</dd>
+                <dt>Resumen</dt>
+                <dd>{{ snapshot.audit.summary }}</dd>
+                <dt>Generado</dt>
+                <dd>{{ snapshot.generatedAt | date : 'medium' }}</dd>
+              </dl>
+            </app-rep-card>
+          }
+        </div>
+      </div>
+    } @else if (loading()) {
+      <app-rep-card title="Cargando branding" [padding]="'sm'">
+        <p class="rep-muted-text rep-caption">Preparando preset editable de identidad.</p>
+      </app-rep-card>
+    }
   </app-rep-section>
 </app-rep-page-container>

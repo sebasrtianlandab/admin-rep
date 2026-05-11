@@ -75,6 +75,8 @@
         [rows]="filteredRows()"
         [rowActions]="paymentRowActions"
         [loading]="loading() && !snapshot()"
+        exportFileName="pagos-transacciones"
+        exportTitle="Pagos · Transacciones"
         [emptyMode]="emptyMode()"
         emptyMessage="Sin pagos en el mock."
         emptyDescription="Las acciones de reintegro exigen permisos y auditoría."

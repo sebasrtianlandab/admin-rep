@@ -37,6 +37,12 @@ import {
   Store,
   Plug,
   Library,
+  Download,
+  FileText,
+  FileSpreadsheet,
+  ChevronsLeft,
+  ChevronsRight,
+  Monitor,
 } from 'lucide-angular';
 
 /**
@@ -81,6 +87,12 @@ import {
       Store,
       Plug,
       Library,
+      Download,
+      FileText,
+      FileSpreadsheet,
+      ChevronsLeft,
+      ChevronsRight,
+      Monitor,
     }),
   ],
   exports: [LucideAngularModule],

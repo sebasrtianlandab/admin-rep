@@ -1,0 +1,24 @@
+<label class="rep-switch" [class.rep-switch--disabled]="disabled()" [attr.for]="fieldId()">
+  <span class="rep-switch__copy">
+    @if (label()) {
+      <span class="rep-switch__label rep-label">{{ label() }}</span>
+    }
+    @if (helperText()) {
+      <span class="rep-switch__helper rep-caption">{{ helperText() }}</span>
+    }
+  </span>
+
+  <span class="rep-switch__control">
+    <input
+      class="rep-switch__input"
+      type="checkbox"
+      [id]="fieldId()"
+      [checked]="checked()"
+      [disabled]="disabled()"
+      (change)="onChange($event)"
+    />
+    <span class="rep-switch__track" aria-hidden="true">
+      <span class="rep-switch__thumb"></span>
+    </span>
+  </span>
+</label>

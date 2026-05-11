@@ -8,16 +8,28 @@
       <app-rep-page-header
         eyebrow="Conectores"
         title="Integraciones"
-        description="Correo, medios, mapas y cobros. Secretos y claves solo enmascarados; la edición real irá a un flujo con permisos elevados."
+        description="Conecta correo, medios, mapas y cobros desde una consola de settings con secretos enmascarados."
       />
     </div>
-    <div class="flex shrink-0 items-center gap-2">
+    <div class="parameters-shell__actions">
       @if (data(); as d) {
-        <app-rep-badge variant="outline" [label]="'Mock · ' + (d.generatedAt | date : 'medium')" />
+        <div class="parameters-shell__meta">
+          <app-rep-badge variant="outline" [label]="'Editó · ' + d.audit.updatedBy" />
+          <app-rep-badge variant="neutral" [label]="'Últ. modif. · ' + (d.audit.updatedAt | date : 'medium')" />
+          @if (dirty()) {
+            <app-rep-badge variant="warning" label="Cambios sin guardar" />
+          }
+        </div>
       }
-      <app-rep-button variant="outline" size="md" [loading]="loading()" (clicked)="refresh()">
+      <app-rep-button variant="ghost" size="md" [disabled]="!dirty() || saving()" (clicked)="resetDraft()">
+        Cancelar
+      </app-rep-button>
+      <app-rep-button variant="outline" size="md" [loading]="loading()" [disabled]="saving()" (clicked)="refresh()">
         <lucide-icon name="refresh-cw" [size]="16" [class.animate-spin]="loading()" />
-        Actualizar
+        Recargar
+      </app-rep-button>
+      <app-rep-button size="md" [loading]="saving()" [disabled]="!dirty()" (clicked)="save()">
+        Guardar cambios
       </app-rep-button>
     </div>
   </app-rep-toolbar>
@@ -26,24 +38,103 @@
     <app-rep-error-state title="No se pudo cargar la sección" [description]="err" />
   }
 
-  <app-rep-section ariaLabel="Integraciones">
-    <div class="parameters-shell__grid">
-      @if (loading() && !data()) {
-        <app-rep-card title="Cargando…" [compact]="true" [padding]="'sm'">
-          <p class="rep-muted-text rep-caption">Obteniendo snapshot mock.</p>
-        </app-rep-card>
-      } @else {
-        @if (data(); as i) {
-          @for (item of i.items; track item.name) {
-            <app-rep-card [title]="item.name" [compact]="true" [padding]="'sm'">
-              <div class="parameters-shell__pill-row">
-                <app-rep-badge [variant]="stateVariant(item.state)" [label]="item.state" />
+  <app-rep-section ariaLabel="Editor de integraciones">
+    @if (draft(); as draft) {
+      <div class="parameters-shell__layout">
+        <div class="parameters-shell__main">
+          <app-rep-card title="Integraciones disponibles" subtitle="Tarjetas con estado operativo y edición segura" [padding]="'sm'">
+            <div class="parameters-shell__stack">
+              @for (item of draft; track item.id) {
+                <button
+                  type="button"
+                  class="parameters-shell__status-card"
+                  [class.parameters-shell__status-card--active]="selectedId() === item.id"
+                  (click)="selectIntegration(item.id)"
+                >
+                  <div class="parameters-shell__editable-header">
+                    <div class="parameters-shell__title-block">
+                      <span class="parameters-shell__title">{{ item.name }}</span>
+                      <span class="parameters-shell__muted rep-caption">{{ item.description }}</span>
+                    </div>
+                    <div class="parameters-shell__pill-row">
+                      <app-rep-badge [variant]="stateVariant(item.status)" [label]="item.status" />
+                      <app-rep-badge variant="outline" [label]="'•••• ' + item.lastFour" />
+                    </div>
+                  </div>
+                  <div class="parameters-shell__pill-row">
+                    <app-rep-badge [variant]="item.enabled ? 'success' : 'neutral'" [label]="item.enabled ? 'Habilitada' : 'Pausada'" />
+                    <span class="rep-caption parameters-shell__muted">Owner · {{ item.owner }}</span>
+                  </div>
+                </button>
+              }
+            </div>
+          </app-rep-card>
+        </div>
+
+        <div class="parameters-shell__aside">
+          @if (selected(); as integration) {
+            <app-rep-card title="Editor lateral" subtitle="Los secretos permanecen enmascarados" [padding]="'sm'">
+              <div class="parameters-shell__group">
+                <app-rep-switch
+                  label="Integración habilitada"
+                  helperText="Si se desactiva, el conector queda fuera de flujo."
+                  [disabled]="saving()"
+                  [checked]="integration.enabled"
+                  (checkedChange)="patchSelected({ enabled: $event })"
+                />
+
+                <app-rep-input
+                  label="Endpoint"
+                  [disabled]="saving()"
+                  [value]="integration.endpoint"
+                  (valueChange)="patchSelected({ endpoint: $event })"
+                />
+                <app-rep-input
+                  label="Owner"
+                  [disabled]="saving()"
+                  [value]="integration.owner"
+                  (valueChange)="patchSelected({ owner: $event })"
+                />
+                <app-rep-textarea
+                  label="Descripción operativa"
+                  [rows]="3"
+                  [disabled]="saving()"
+                  [value]="integration.description"
+                  (valueChange)="patchSelected({ description: $event })"
+                />
+
+                <div class="parameters-shell__preview-surface">
+                  <div class="parameters-shell__pill-row">
+                    <app-rep-badge [variant]="stateVariant(integration.status)" [label]="integration.status" />
+                    <app-rep-badge variant="outline" [label]="'•••• ' + integration.lastFour" />
+                  </div>
+                  <p class="rep-caption parameters-shell__muted">
+                    Última rotación · {{ integration.lastRotated | date : 'medium' }}
+                  </p>
+                  <div class="parameters-shell__editor-actions">
+                    <app-rep-button variant="outline" size="md" [disabled]="saving()" (clicked)="openRotateDialog()">
+                      Rotar credencial
+                    </app-rep-button>
+                  </div>
+                </div>
               </div>
-              <p class="rep-muted-text rep-caption mt-2">{{ item.detail }}</p>
             </app-rep-card>
           }
-        }
-      }
-    </div>
+        </div>
+      </div>
+    } @else if (loading()) {
+      <app-rep-card title="Cargando integraciones" [padding]="'sm'">
+        <p class="rep-muted-text rep-caption">Preparando conectores editables.</p>
+      </app-rep-card>
+    }
   </app-rep-section>
+
+  <app-rep-confirm-dialog
+    [(open)]="rotateDialogOpen"
+    titleText="Rotar credencial"
+    messageText="Se generará un nuevo sufijo mock y se actualizará la fecha de rotación. El valor completo seguirá oculto."
+    confirmLabel="Rotar ahora"
+    cancelLabel="Cancelar"
+    (confirmed)="confirmRotate()"
+  />
 </app-rep-page-container>
