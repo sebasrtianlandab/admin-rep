@@ -1,0 +1,14 @@
+<span
+  class="rep-avatar"
+  [class.rep-avatar--sm]="size() === 'sm'"
+  [class.rep-avatar--md]="size() === 'md'"
+  [class.rep-avatar--lg]="size() === 'lg'"
+  role="img"
+  [attr.aria-label]="alt() || label()"
+>
+  @if (src(); as url) {
+    <img class="rep-avatar__img" [src]="url" [alt]="alt() || label()" />
+  } @else {
+    <span class="rep-avatar__initials">{{ initials() }}</span>
+  }
+</span>

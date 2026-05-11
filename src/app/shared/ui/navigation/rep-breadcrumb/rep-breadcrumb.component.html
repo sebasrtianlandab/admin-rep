@@ -1,0 +1,25 @@
+@if (items().length) {
+  <nav class="rep-breadcrumb" aria-label="Migas de pan">
+    <ol class="rep-breadcrumb__list">
+      @for (item of items(); track $index; let last = $last) {
+        <li class="rep-breadcrumb__item">
+          @if (!last && item.link) {
+            <a class="rep-breadcrumb__link" [routerLink]="item.link">{{ item.label }}</a>
+          } @else {
+            <span class="rep-breadcrumb__current" [attr.aria-current]="last ? 'page' : null">
+              {{ item.label }}
+            </span>
+          }
+          @if (!last) {
+            <lucide-icon
+              name="chevron-right"
+              class="rep-breadcrumb__sep"
+              [size]="14"
+              aria-hidden="true"
+            />
+          }
+        </li>
+      }
+    </ol>
+  </nav>
+}

@@ -1,0 +1,10 @@
+/**
+ * Global styles entry — single source for the design system pipeline.
+ * Order: tokens → Tailwind → base globals → utilities → theme.
+ */
+
+@import './tokens.css';
+@import './tailwind.css';
+@import './globals.css';
+@import './utilities.css';
+@import './theme.css';

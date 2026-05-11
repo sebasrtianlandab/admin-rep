@@ -1,0 +1,37 @@
+:host {
+  display: inline-flex;
+  vertical-align: middle;
+}
+
+.rep-spinner {
+  display: inline-block;
+  border-radius: 9999px;
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--muted-foreground) 35%, transparent);
+  border-right-color: var(--primary);
+  animation: rep-spinner-rotate 0.7s linear infinite;
+}
+
+.rep-spinner--sm {
+  width: 0.875rem;
+  height: 0.875rem;
+  border-width: 2px;
+}
+
+.rep-spinner--md {
+  width: 1.125rem;
+  height: 1.125rem;
+  border-width: 2px;
+}
+
+.rep-spinner--lg {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-width: 3px;
+}
+
+@keyframes rep-spinner-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}

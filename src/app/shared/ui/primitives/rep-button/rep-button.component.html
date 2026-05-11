@@ -1,0 +1,14 @@
+<button
+  [attr.type]="type()"
+  [class]="btnClass()"
+  [attr.aria-label]="ariaLabel() ?? undefined"
+  [disabled]="disabled() || loading()"
+  (click)="onClick($event)"
+>
+  @if (loading()) {
+    <lucide-icon name="loader-2" class="rep-btn__spinner" [size]="16" aria-hidden="true" />
+  }
+  <span class="rep-btn__inner">
+    <ng-content />
+  </span>
+</button>

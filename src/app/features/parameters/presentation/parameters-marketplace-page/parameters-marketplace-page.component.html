@@ -1,0 +1,69 @@
+<app-rep-page-container>
+  <app-rep-toolbar>
+    <div class="flex min-w-0 flex-1 flex-col gap-3">
+      <a routerLink="/parameters" class="parameters-shell__back">
+        <lucide-icon name="chevron-left" [size]="16" />
+        Centro de parámetros
+      </a>
+      <app-rep-page-header
+        eyebrow="Operación"
+        title="Marketplace"
+        description="Estados de publicación, reglas de destacados y límites del catálogo. Gobierno del flujo operativo, no inventario técnico."
+      />
+    </div>
+    <div class="flex shrink-0 items-center gap-2">
+      @if (data(); as d) {
+        <app-rep-badge variant="outline" [label]="'Mock · ' + (d.generatedAt | date : 'medium')" />
+      }
+      <app-rep-button variant="outline" size="md" [loading]="loading()" (clicked)="refresh()">
+        <lucide-icon name="refresh-cw" [size]="16" [class.animate-spin]="loading()" />
+        Actualizar
+      </app-rep-button>
+    </div>
+  </app-rep-toolbar>
+
+  @if (error(); as err) {
+    <app-rep-error-state title="No se pudo cargar la sección" [description]="err" />
+  }
+
+  <app-rep-section ariaLabel="Estados y reglas">
+    <div class="parameters-shell__grid">
+      @if (loading() && !data()) {
+        <app-rep-card title="Cargando…" [compact]="true" [padding]="'sm'">
+          <p class="rep-muted-text rep-caption">Obteniendo snapshot mock.</p>
+        </app-rep-card>
+      } @else {
+        @if (data(); as m) {
+          <app-rep-card title="Estados de propiedad" subtitle="Etiqueta y color por código" [compact]="true" [padding]="'sm'">
+            <ul class="parameters-shell__list">
+              @for (row of m.statusRows; track row.code) {
+                <li class="parameters-shell__list-item">
+                  <span class="font-semibold">{{ row.label }}</span>
+                  <span class="parameters-shell__pill-row">
+                    <app-rep-badge variant="outline" [label]="row.code" />
+                    @if (row.active) {
+                      <app-rep-badge variant="success" label="Activo" />
+                    } @else {
+                      <app-rep-badge variant="neutral" label="Inactivo" />
+                    }
+                    <span
+                      class="parameters-shell__swatch"
+                      [style.background]="row.color"
+                      [title]="row.color"
+                    ></span>
+                  </span>
+                </li>
+              }
+            </ul>
+          </app-rep-card>
+          <app-rep-card title="Destacados" [compact]="true" [padding]="'sm'">
+            <p class="rep-caption">{{ m.featuredDefault }}</p>
+          </app-rep-card>
+          <app-rep-card title="Publicación" [compact]="true" [padding]="'sm'">
+            <p class="rep-caption">{{ m.publishRuleSummary }}</p>
+          </app-rep-card>
+        }
+      }
+    </div>
+  </app-rep-section>
+</app-rep-page-container>

@@ -1,0 +1,17 @@
+:host {
+  display: block;
+}
+
+.parameters-advanced__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--rep-color-fg-muted, #64748b);
+  text-decoration: none;
+}
+
+.parameters-advanced__back:hover {
+  color: var(--rep-color-fg, #0f172a);
+}

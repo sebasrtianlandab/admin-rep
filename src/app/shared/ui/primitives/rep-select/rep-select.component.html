@@ -1,0 +1,25 @@
+<div class="rep-field" [class.rep-field--error]="error()">
+  @if (label()) {
+    <label class="rep-field__label rep-label" [attr.for]="fieldId()">{{ label() }}</label>
+  }
+  <select
+    class="rep-field__control rep-field__control--select"
+    [id]="fieldId()"
+    [disabled]="disabled()"
+    [(ngModel)]="value"
+    (blur)="blurred.emit($event)"
+    (focus)="focused.emit($event)"
+  >
+    @if (placeholder()) {
+      <option value="" disabled selected hidden>{{ placeholder() }}</option>
+    }
+    @for (opt of options(); track opt.value) {
+      <option [value]="opt.value" [disabled]="opt.disabled">{{ opt.label }}</option>
+    }
+  </select>
+  @if (error()) {
+    <p class="rep-field__error" role="alert">{{ error() }}</p>
+  } @else if (helperText()) {
+    <p class="rep-field__helper rep-caption">{{ helperText() }}</p>
+  }
+</div>

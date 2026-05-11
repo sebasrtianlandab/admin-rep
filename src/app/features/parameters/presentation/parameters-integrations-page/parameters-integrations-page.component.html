@@ -1,0 +1,49 @@
+<app-rep-page-container>
+  <app-rep-toolbar>
+    <div class="flex min-w-0 flex-1 flex-col gap-3">
+      <a routerLink="/parameters" class="parameters-shell__back">
+        <lucide-icon name="chevron-left" [size]="16" />
+        Centro de parámetros
+      </a>
+      <app-rep-page-header
+        eyebrow="Conectores"
+        title="Integraciones"
+        description="Correo, medios, mapas y cobros. Secretos y claves solo enmascarados; la edición real irá a un flujo con permisos elevados."
+      />
+    </div>
+    <div class="flex shrink-0 items-center gap-2">
+      @if (data(); as d) {
+        <app-rep-badge variant="outline" [label]="'Mock · ' + (d.generatedAt | date : 'medium')" />
+      }
+      <app-rep-button variant="outline" size="md" [loading]="loading()" (clicked)="refresh()">
+        <lucide-icon name="refresh-cw" [size]="16" [class.animate-spin]="loading()" />
+        Actualizar
+      </app-rep-button>
+    </div>
+  </app-rep-toolbar>
+
+  @if (error(); as err) {
+    <app-rep-error-state title="No se pudo cargar la sección" [description]="err" />
+  }
+
+  <app-rep-section ariaLabel="Integraciones">
+    <div class="parameters-shell__grid">
+      @if (loading() && !data()) {
+        <app-rep-card title="Cargando…" [compact]="true" [padding]="'sm'">
+          <p class="rep-muted-text rep-caption">Obteniendo snapshot mock.</p>
+        </app-rep-card>
+      } @else {
+        @if (data(); as i) {
+          @for (item of i.items; track item.name) {
+            <app-rep-card [title]="item.name" [compact]="true" [padding]="'sm'">
+              <div class="parameters-shell__pill-row">
+                <app-rep-badge [variant]="stateVariant(item.state)" [label]="item.state" />
+              </div>
+              <p class="rep-muted-text rep-caption mt-2">{{ item.detail }}</p>
+            </app-rep-card>
+          }
+        }
+      }
+    </div>
+  </app-rep-section>
+</app-rep-page-container>

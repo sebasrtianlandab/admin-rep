@@ -1,0 +1,152 @@
+<div
+  class="rep-table-wrap"
+  [class.rep-table-wrap--compact]="isCompact()"
+  [class.rep-table-wrap--comfortable]="!isCompact()"
+  [class.rep-table-wrap--sticky]="stickyHeader()"
+>
+  <div class="rep-table__chrome">
+    <ng-content select="[repTableToolbar]" />
+    <div class="rep-table__header-actions">
+      <ng-content select="[repTableHeaderActions]" />
+    </div>
+  </div>
+
+  <div class="rep-table-scroll">
+    <table class="rep-table">
+      <thead>
+        <tr>
+          @for (col of columns(); track col.key) {
+            <th
+              class="rep-table__th rep-table-text"
+              [style.width]="col.width ?? undefined"
+              [class.rep-table__th--right]="col.align === 'right'"
+              [class.rep-table__th--center]="col.align === 'center'"
+              [class.rep-table__th--sortable]="col.sortable"
+              [attr.aria-sort]="
+                !col.sortable
+                  ? null
+                  : sortStateFor(col) === 'asc'
+                    ? 'ascending'
+                    : sortStateFor(col) === 'desc'
+                      ? 'descending'
+                      : null
+              "
+            >
+              @if (col.sortable) {
+                <button type="button" class="rep-table__sort-btn" (click)="toggleSort(col)">
+                  <span class="rep-table__sort-label">{{ col.label }}</span>
+                  @switch (sortStateFor(col)) {
+                    @case ('asc') {
+                      <lucide-icon name="chevron-up" class="rep-table__sort-ico" [size]="14" />
+                    }
+                    @case ('desc') {
+                      <lucide-icon name="chevron-down" class="rep-table__sort-ico" [size]="14" />
+                    }
+                    @default {
+                      <lucide-icon
+                        name="chevrons-up-down"
+                        class="rep-table__sort-ico rep-table__sort-ico--muted"
+                        [size]="14"
+                      />
+                    }
+                  }
+                </button>
+              } @else {
+                {{ col.label }}
+              }
+            </th>
+          }
+        </tr>
+      </thead>
+      <tbody>
+        @if (loading()) {
+          @for (i of loadingIndices(); track i) {
+            <tr class="rep-table__tr rep-table__tr--loading">
+              @for (col of columns(); track col.key) {
+                <td class="rep-table__td">
+                  <app-rep-skeleton variant="text" [lines]="1" />
+                </td>
+              }
+            </tr>
+          }
+        } @else if (sortedRows().length === 0) {
+          <tr>
+            <td class="rep-table__td rep-table__td--empty" [attr.colspan]="columns().length || 1">
+              <app-rep-empty-state
+                iconName="inbox"
+                [title]="emptyTitle()"
+                [description]="emptyDescription() ?? emptyMessage()"
+              />
+            </td>
+          </tr>
+        } @else {
+          @for (row of pagedRows(); track $index; let idx = $index) {
+            <tr class="rep-table__tr">
+              @for (col of columns(); track col.key) {
+                <td
+                  class="rep-table__td rep-table-text"
+                  [style.width]="col.width ?? undefined"
+                  [class.rep-table__td--right]="col.align === 'right'"
+                  [class.rep-table__td--center]="col.align === 'center'"
+                  [class.rep-table__td--truncate]="col.truncate"
+                  [class.rep-table__td--actions]="col.actions"
+                >
+                  @if (col.actions) {
+                    @if (rowActions(); as tpl) {
+                      <div class="rep-table__actions">
+                        <ng-container
+                          [ngTemplateOutlet]="tpl"
+                          [ngTemplateOutletContext]="{ $implicit: row, index: idx }"
+                        />
+                      </div>
+                    } @else {
+                      <span class="rep-muted-text">—</span>
+                    }
+                  } @else if (col.cellType === 'badge') {
+                    <app-rep-badge
+                      [label]="cellText(row, col.key)"
+                      [variant]="badgeVariantFor(col, row)"
+                    />
+                  } @else {
+                    {{ cellText(row, col.key) }}
+                  }
+                </td>
+              }
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+  </div>
+
+  @if (paginationEnabled() && !loading() && sortedRows().length > 0) {
+    <div class="rep-table__footer">
+      <span class="rep-table__range rep-caption rep-muted-text">{{ rangeLabel() }}</span>
+      <div class="rep-table__pager">
+        <app-rep-button
+          variant="ghost"
+          size="sm"
+          [disabled]="effectivePageIndex() <= 0"
+          (clicked)="prevPage()"
+          [iconOnly]="true"
+          [ariaLabel]="'Página anterior'"
+        >
+          <lucide-icon name="chevron-left" [size]="16" />
+        </app-rep-button>
+        <span class="rep-table__page rep-caption">
+          {{ effectivePageIndex() + 1 }} / {{ maxPageIndex() + 1 }}
+        </span>
+        <app-rep-button
+          variant="ghost"
+          size="sm"
+          [disabled]="effectivePageIndex() >= maxPageIndex()"
+          (clicked)="nextPage()"
+          [iconOnly]="true"
+          [ariaLabel]="'Página siguiente'"
+        >
+          <lucide-icon name="chevron-right" [size]="16" />
+        </app-rep-button>
+      </div>
+    </div>
+  }
+</div>

@@ -1,0 +1,191 @@
+/**
+ * Enterprise layout + typography utilities (no component-scoped colors here).
+ */
+
+/* ----- Shell / sidebar ----- */
+
+.rep-sidebar {
+  width: var(--rep-sidebar-width);
+}
+
+.rep-sidebar--collapsed {
+  width: var(--rep-sidebar-width-collapsed);
+}
+
+/* ----- Page shell ----- */
+
+.rep-page-container {
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  width: 100%;
+  max-width: var(--rep-page-max-width);
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--rep-section-gap);
+}
+
+.rep-page-spacing {
+  padding: var(--rep-page-padding-y) var(--rep-page-padding-x);
+}
+
+.rep-toolbar {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--rep-content-gap);
+}
+
+@media (min-width: 40rem) {
+  .rep-toolbar {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--rep-spacing-md) var(--rep-content-gap);
+  }
+
+  .rep-toolbar > :first-child {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  .rep-toolbar > :last-child {
+    flex: 0 0 auto;
+    padding-top: 0.125rem;
+  }
+}
+
+/* ----- Grids ----- */
+
+.rep-grid-kpi {
+  display: grid;
+  gap: var(--spacing-md);
+  align-items: stretch;
+}
+
+@media (min-width: 40rem) {
+  .rep-grid-kpi {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Una fila de 4 KPI desde laptop típico (referencia WhatsApp / dashboard REP) */
+@media (min-width: 64rem) {
+  .rep-grid-kpi {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.rep-card-grid {
+  display: grid;
+  gap: var(--rep-gutter);
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 64rem) {
+  .rep-card-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.rep-card-grid__main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rep-gutter);
+}
+
+@media (min-width: 64rem) {
+  .rep-card-grid__main {
+    grid-column: span 2 / span 2;
+  }
+}
+
+.rep-card-grid__aside {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rep-gutter);
+}
+
+/* ----- Typography (semantic) ----- */
+
+/* ERP shell: sans page titles (single typographic system; display reserved for marketing) */
+.rep-page-title {
+  font-family: var(--font-sans);
+  font-size: 1.375rem;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  color: var(--foreground);
+}
+
+@media (min-width: 40rem) {
+  .rep-page-title {
+    font-size: 1.5rem;
+  }
+}
+
+.rep-section-title {
+  font-family: var(--font-sans);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+.rep-muted-text {
+  color: var(--muted-foreground);
+}
+
+.rep-table-text {
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--foreground);
+}
+
+.rep-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--foreground);
+}
+
+.rep-caption {
+  font-size: 0.6875rem;
+  line-height: 1.25;
+  color: var(--muted-foreground);
+}
+
+.rep-text-success {
+  color: var(--success);
+}
+
+.rep-text-danger {
+  color: var(--danger);
+}
+
+/* ----- Scroll / table chrome ----- */
+
+.rep-scroll-area {
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: auto;
+}
+
+.rep-table-container {
+  min-width: 0;
+}
+
+/* ----- Dividers ----- */
+
+.rep-muted {
+  color: var(--muted-foreground);
+}
+
+.rep-divider {
+  height: 1px;
+  width: 100%;
+  background-color: var(--border);
+  border: 0;
+  margin: 0;
+}

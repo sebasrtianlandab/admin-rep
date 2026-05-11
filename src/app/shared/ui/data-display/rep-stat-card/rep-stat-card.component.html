@@ -1,0 +1,7 @@
+<div class="rep-stat" [class.rep-stat--compact]="compact()">
+  <p class="rep-stat__label rep-label">{{ label() }}</p>
+  <p class="rep-stat__value rep-table-text">{{ value() }}</p>
+  @if (hint(); as h) {
+    <p class="rep-stat__hint rep-muted-text rep-caption">{{ h }}</p>
+  }
+</div>

@@ -1,0 +1,20 @@
+<div class="rep-field" [class.rep-field--error]="error()">
+  @if (label()) {
+    <label class="rep-field__label rep-label" [attr.for]="fieldId()">{{ label() }}</label>
+  }
+  <textarea
+    class="rep-field__control rep-field__control--textarea"
+    [id]="fieldId()"
+    [rows]="rows()"
+    [placeholder]="placeholder()"
+    [disabled]="disabled()"
+    [(ngModel)]="value"
+    (blur)="blurred.emit($event)"
+    (focus)="focused.emit($event)"
+  ></textarea>
+  @if (error()) {
+    <p class="rep-field__error" role="alert">{{ error() }}</p>
+  } @else if (helperText()) {
+    <p class="rep-field__helper rep-caption">{{ helperText() }}</p>
+  }
+</div>

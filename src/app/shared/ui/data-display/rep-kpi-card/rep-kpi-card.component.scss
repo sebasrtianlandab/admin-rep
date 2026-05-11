@@ -1,0 +1,121 @@
+:host {
+  display: block;
+}
+
+.rep-kpi {
+  display: flex;
+  height: 100%;
+  min-height: 5.125rem;
+  flex-direction: column;
+  justify-content: space-between;
+  border-radius: var(--radius-md);
+  border: 1px solid color-mix(in srgb, var(--border) 80%, var(--rep-surface-app));
+  background: var(--rep-surface-card);
+  padding: var(--spacing-sm) var(--spacing-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.rep-kpi__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+}
+
+.rep-kpi__label {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.6875rem;
+  color: var(--muted-foreground);
+}
+
+.rep-kpi__icon {
+  display: flex;
+  width: 1.875rem;
+  height: 1.875rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--rep-surface-elevated) 65%, var(--muted));
+  color: var(--primary);
+}
+
+/* lucide-icon mueve la clase `class` al SVG; el host debe ocupar el hueco y centrar el SVG */
+.rep-kpi__icon lucide-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  flex-shrink: 0;
+}
+
+.rep-kpi__icon ::ng-deep svg {
+  display: block;
+  flex-shrink: 0;
+}
+
+.rep-kpi__body {
+  padding-top: var(--spacing-xs);
+}
+
+.rep-kpi__value {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  color: var(--foreground);
+}
+
+@media (min-width: 48rem) {
+  .rep-kpi__value {
+    font-size: 1.3125rem;
+  }
+}
+
+.rep-kpi__hint {
+  margin: var(--spacing-xs) 0 0;
+}
+
+.rep-kpi__trend {
+  margin: var(--spacing-sm) 0 0;
+  font-weight: 500;
+  font-size: 0.75rem;
+}
+
+.rep-kpi__skel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  padding-top: var(--spacing-xs);
+}
+
+.rep-kpi__skel-line {
+  border-radius: var(--radius-sm);
+  background: var(--muted);
+  animation: rep-kpi-pulse 1.1s ease-in-out infinite;
+}
+
+.rep-kpi__skel-line--lg {
+  height: 1.75rem;
+  width: 6rem;
+}
+
+.rep-kpi__skel-line--sm {
+  height: 0.75rem;
+  width: 4rem;
+}
+
+@keyframes rep-kpi-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}

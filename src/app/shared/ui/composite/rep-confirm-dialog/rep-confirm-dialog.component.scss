@@ -1,0 +1,49 @@
+:host {
+  display: contents;
+}
+
+.rep-dialog {
+  border: none;
+  padding: 0;
+  background: transparent;
+  max-width: none;
+  width: 100%;
+}
+
+.rep-dialog::backdrop {
+  background: var(--rep-surface-overlay);
+}
+
+.rep-dialog__panel {
+  margin: auto;
+  width: min(100% - 2rem, 26rem);
+  padding: var(--spacing-xl);
+  border-radius: var(--radius-lg);
+  border: 1px solid color-mix(in srgb, var(--border) 88%, var(--rep-surface-app));
+  background: var(--rep-surface-card);
+  color: var(--card-foreground);
+  box-shadow: var(--shadow-overlay);
+}
+
+.rep-dialog__title {
+  margin: 0 0 var(--spacing-md);
+  font-family: var(--font-sans);
+  font-size: 1.0625rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  text-transform: none;
+  color: var(--foreground);
+}
+
+.rep-dialog__msg {
+  margin: 0 0 var(--spacing-xl);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.rep-dialog__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}

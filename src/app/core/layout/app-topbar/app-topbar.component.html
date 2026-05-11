@@ -1,0 +1,42 @@
+<header
+  class="app-topbar flex h-[var(--rep-shell-header-height)] shrink-0 items-center justify-between gap-2 border-b border-sidebar-border bg-sidebar px-3 text-sidebar-foreground md:px-4"
+>
+  <div class="flex min-w-0 flex-1 items-center gap-2 md:gap-3">
+    <button
+      type="button"
+      class="inline-flex size-9 shrink-0 items-center justify-center rounded-md border border-sidebar-border bg-sidebar-accent/80 text-sidebar-foreground md:hidden"
+      (click)="onMenu()"
+      aria-label="Abrir menú"
+    >
+      <lucide-icon name="menu" class="size-5" />
+    </button>
+    <div class="hidden h-4 w-px shrink-0 bg-sidebar-border md:block" aria-hidden="true"></div>
+    <app-rep-breadcrumb class="hidden min-w-0 md:block" [items]="breadcrumbItems()" />
+    <span
+      class="truncate text-xs font-medium uppercase tracking-wide text-muted-foreground md:hidden"
+    >
+      {{ brand.adminProductName }}
+    </span>
+  </div>
+
+  <div class="flex shrink-0 items-center gap-2">
+    <span
+      class="app-topbar__env hidden rounded-md border border-sidebar-border bg-sidebar-accent/80 px-2 py-1 font-mono text-[10px] font-semibold uppercase tracking-wider text-muted-foreground sm:inline-block"
+      [attr.title]="'Entorno de demostración'"
+    >
+      {{ brand.environmentLabel }}
+    </span>
+    <button
+      type="button"
+      class="inline-flex size-9 items-center justify-center rounded-md border border-sidebar-border bg-sidebar-accent/80 text-sidebar-foreground transition-colors hover:bg-sidebar-accent"
+      (click)="onToggleTheme()"
+      [attr.aria-label]="theme.dark() ? 'Modo claro' : 'Modo oscuro'"
+    >
+      @if (theme.dark()) {
+        <lucide-icon name="sun" class="size-5" />
+      } @else {
+        <lucide-icon name="moon" class="size-5" />
+      }
+    </button>
+  </div>
+</header>

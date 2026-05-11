@@ -1,0 +1,15 @@
+<section class="rep-section" [attr.aria-label]="ariaLabel() ?? null">
+  @if (title() || subtitle()) {
+    <header class="rep-section__head">
+      @if (title(); as t) {
+        <h2 class="rep-section__title rep-section-title">{{ t }}</h2>
+      }
+      @if (subtitle(); as st) {
+        <p class="rep-section__sub rep-muted-text rep-caption">{{ st }}</p>
+      }
+    </header>
+  }
+  <div class="rep-section__body">
+    <ng-content />
+  </div>
+</section>

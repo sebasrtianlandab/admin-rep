@@ -1,0 +1,12 @@
+<div class="rep-error" role="alert">
+  <div class="rep-error__icon" aria-hidden="true">
+    <lucide-icon name="alert-triangle" class="rep-error__icon-svg" [size]="20" />
+  </div>
+  <h3 class="rep-error__title">{{ title() }}</h3>
+  @if (description(); as desc) {
+    <p class="rep-error__desc rep-muted-text">{{ desc }}</p>
+  }
+  <div class="rep-error__action">
+    <ng-content select="[repErrorAction]" />
+  </div>
+</div>

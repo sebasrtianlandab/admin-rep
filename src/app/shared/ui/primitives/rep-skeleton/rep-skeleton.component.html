@@ -1,0 +1,26 @@
+@switch (variant()) {
+  @case ('text') {
+    <div class="rep-skel rep-skel--text">
+      @for (i of lineIndices(); track i) {
+        <div class="rep-skel__line" [style.width.%]="90 - i * 12"></div>
+      }
+    </div>
+  }
+  @case ('card') {
+    <div class="rep-skel rep-skel--card">
+      <div class="rep-skel__card-h"></div>
+      <div class="rep-skel__card-b"></div>
+      <div class="rep-skel__card-b rep-skel__card-b--short"></div>
+    </div>
+  }
+  @case ('avatar') {
+    <div class="rep-skel rep-skel--avatar" aria-hidden="true"></div>
+  }
+  @case ('table-row') {
+    <div class="rep-skel rep-skel--row">
+      @for (c of [1, 2, 3, 4]; track c) {
+        <div class="rep-skel__cell"></div>
+      }
+    </div>
+  }
+}

@@ -1,0 +1,34 @@
+<div class="rep-kpi">
+  <div class="rep-kpi__head">
+    <p class="rep-kpi__label">
+      {{ label() }}
+    </p>
+    <div class="rep-kpi__icon" aria-hidden="true">
+      <lucide-icon [name]="iconName()" [size]="18" />
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="rep-kpi__skel">
+      <div class="rep-kpi__skel-line rep-kpi__skel-line--lg"></div>
+      <div class="rep-kpi__skel-line rep-kpi__skel-line--sm"></div>
+    </div>
+  } @else {
+    <div class="rep-kpi__body">
+      <p class="rep-kpi__value rep-table-text">{{ value() }}</p>
+      @if (hint()) {
+        <p class="rep-kpi__hint rep-muted-text rep-caption">{{ hint() }}</p>
+      }
+      @if (trendLabel(); as trend) {
+        <p
+          class="rep-kpi__trend rep-caption"
+          [class.rep-text-success]="trendPositive() === true"
+          [class.rep-text-danger]="trendPositive() === false"
+          [class.rep-muted-text]="trendPositive() === null"
+        >
+          {{ trend }}
+        </p>
+      }
+    </div>
+  }
+</div>

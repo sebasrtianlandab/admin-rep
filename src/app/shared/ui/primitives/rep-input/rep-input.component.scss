@@ -1,0 +1,26 @@
+@use '../../../../../styles/rep-field' as *;
+
+:host {
+  display: block;
+}
+
+.rep-field--embedded .rep-field__label {
+  margin-bottom: var(--spacing-xs);
+}
+
+.rep-field--embedded .rep-field__control {
+  min-height: 2.5rem;
+  padding-block: 0.5rem;
+  line-height: 1.35;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.rep-field--embedded .rep-field__control:hover:not(:disabled) {
+  border-color: transparent;
+}
+
+.rep-field--embedded .rep-field__control:focus-visible {
+  box-shadow: none;
+}

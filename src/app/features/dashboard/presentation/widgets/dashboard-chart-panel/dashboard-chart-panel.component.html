@@ -1,0 +1,14 @@
+<app-rep-card [title]="title()" [subtitle]="description()" [padding]="'sm'">
+  <div class="flex items-center gap-2 text-muted-foreground">
+    <lucide-icon name="bar-chart-3" class="size-4 shrink-0" />
+    <span class="text-xs">Gráfico · datos de demostración</span>
+  </div>
+  <div class="mt-4 flex h-36 items-end gap-1.5">
+    @for (h of barHeights; track $index) {
+      <div
+        class="flex-1 rounded-t bg-gradient-to-t from-primary/25 to-primary/70 opacity-90"
+        [style.height.%]="h"
+      ></div>
+    }
+  </div>
+</app-rep-card>

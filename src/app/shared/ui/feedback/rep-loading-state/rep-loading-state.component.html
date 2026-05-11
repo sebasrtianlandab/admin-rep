@@ -1,0 +1,8 @@
+<div class="rep-loading" role="status" aria-live="polite" aria-busy="true">
+  @if (message(); as msg) {
+    <p class="rep-loading__msg rep-muted-text rep-caption">{{ msg }}</p>
+  }
+  <div class="rep-loading__body">
+    <ng-content />
+  </div>
+</div>

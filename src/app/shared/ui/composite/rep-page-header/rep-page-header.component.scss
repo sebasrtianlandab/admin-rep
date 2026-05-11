@@ -1,0 +1,25 @@
+:host {
+  display: block;
+}
+
+.rep-page-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  padding-bottom: var(--spacing-sm);
+}
+
+.rep-page-header__eyebrow {
+  margin: 0;
+}
+
+.rep-page-header__title {
+  margin: 0;
+}
+
+.rep-page-header__desc {
+  margin: 0;
+  max-width: min(100%, 40rem);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+}

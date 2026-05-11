@@ -1,0 +1,65 @@
+/**
+ * Shared form field surface (used by RepInput, RepSelect, RepTextarea).
+ * Imported from component SCSS so styles stay encapsulated per component.
+ */
+
+.rep-field__label {
+  display: block;
+  margin-bottom: var(--spacing-sm);
+}
+
+.rep-field__control {
+  display: block;
+  width: 100%;
+  min-height: 2.25rem;
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  line-height: 1.4;
+  color: var(--foreground);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: none;
+  transition:
+    border-color var(--rep-transition-normal),
+    box-shadow var(--rep-transition-normal),
+    background-color var(--rep-transition-normal);
+}
+
+.rep-field__control:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--foreground) 12%, var(--border));
+}
+
+.rep-field__control::placeholder {
+  color: var(--muted-foreground);
+}
+
+.rep-field__control:focus {
+  outline: none;
+}
+
+.rep-field__control:focus-visible {
+  border-color: var(--ring);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--ring) 35%, transparent);
+}
+
+.rep-field__control:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: var(--muted);
+}
+
+.rep-field--error .rep-field__control {
+  border-color: var(--danger);
+}
+
+.rep-field__error {
+  margin: var(--spacing-sm) 0 0;
+  font-size: 0.8125rem;
+  color: var(--danger);
+}
+
+.rep-field__helper {
+  margin: var(--spacing-sm) 0 0;
+}

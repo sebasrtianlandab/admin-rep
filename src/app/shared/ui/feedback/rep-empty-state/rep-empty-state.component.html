@@ -1,0 +1,14 @@
+<div class="rep-empty" role="status">
+  @if (iconName(); as ic) {
+    <div class="rep-empty__icon" aria-hidden="true">
+      <lucide-icon [name]="ic" class="rep-empty__icon-svg" />
+    </div>
+  }
+  <h3 class="rep-empty__title">{{ title() }}</h3>
+  @if (description(); as desc) {
+    <p class="rep-empty__desc rep-muted-text">{{ desc }}</p>
+  }
+  <div class="rep-empty__action">
+    <ng-content select="[repEmptyAction]" />
+  </div>
+</div>

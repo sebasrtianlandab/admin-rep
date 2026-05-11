@@ -1,0 +1,61 @@
+<app-rep-page-container>
+  <app-rep-toolbar>
+    <app-rep-page-header
+      eyebrow="Producto"
+      title="Parámetros"
+      description="Centro de configuración del marketplace: contenido público, branding, operación comercial e integraciones. Use Avanzado solo para flags, secretos y variables internas."
+    />
+    <div class="flex shrink-0 items-center gap-2">
+      @if (snapshot(); as snap) {
+        <app-rep-badge
+          variant="outline"
+          [label]="'Actualizado · ' + (snap.generatedAt | date : 'medium')"
+        />
+      }
+      <app-rep-button variant="outline" size="md" [loading]="loading()" (clicked)="refresh()">
+        <lucide-icon name="refresh-cw" [size]="16" [class.animate-spin]="loading()" />
+        Actualizar
+      </app-rep-button>
+    </div>
+  </app-rep-toolbar>
+
+  @if (error(); as err) {
+    <app-rep-error-state title="No se pudo cargar el hub" [description]="err" />
+  }
+
+  <app-rep-section ariaLabel="Áreas de configuración">
+    <div class="parameters-hub__grid">
+      @if (loading() && !snapshot()) {
+        @for (i of [1, 2, 3, 4, 5, 6, 7, 8]; track i) {
+          <app-rep-card [compact]="true" [padding]="'sm'" title="…" subtitle="Cargando">
+            <p class="rep-muted-text rep-caption">—</p>
+          </app-rep-card>
+        }
+      } @else {
+        @if (snapshot(); as snap) {
+          @for (card of snap.cards; track trackById($index, card)) {
+            <a class="parameters-hub__card-link" [routerLink]="['/parameters', card.path]">
+              <app-rep-card [compact]="true" [padding]="'sm'" [title]="card.title" [subtitle]="card.description">
+                <div class="parameters-hub__meta">
+                  <lucide-icon class="parameters-hub__icon" [name]="card.icon" [size]="22" />
+                  <div class="parameters-hub__chips">
+                    <app-rep-badge variant="outline" [label]="'Impacto: ' + card.impact" />
+                    <app-rep-badge [variant]="riskVariant(card.risk)" [label]="'Riesgo: ' + card.risk" />
+                    <app-rep-badge
+                      variant="neutral"
+                      [label]="'Última modif. · ' + (card.lastModified | date : 'medium')"
+                    />
+                  </div>
+                </div>
+                <div repCardFooter class="parameters-hub__footer">
+                  <span class="parameters-hub__cta">Abrir sección</span>
+                  <lucide-icon name="chevron-right" [size]="16" />
+                </div>
+              </app-rep-card>
+            </a>
+          }
+        }
+      }
+    </div>
+  </app-rep-section>
+</app-rep-page-container>

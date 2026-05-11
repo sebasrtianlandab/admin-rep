@@ -1,0 +1,71 @@
+:host {
+  display: contents;
+}
+
+.app-sidebar__brand {
+  gap: var(--rep-spacing-md);
+}
+
+.app-sidebar__brand--collapsed {
+  justify-content: center;
+  padding-inline: var(--rep-spacing-sm);
+}
+
+.app-sidebar__logo-wrap {
+  position: relative;
+  display: flex;
+  height: 2.25rem;
+  width: 2.25rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: var(--card);
+  box-shadow: 0 0 0 1px var(--border);
+}
+
+.app-sidebar__logo-btn {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: var(--rep-spacing-xs);
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  border-radius: var(--radius-md);
+  transition: background-color var(--rep-transition-fast);
+}
+
+.app-sidebar__logo-btn:hover {
+  background: color-mix(in srgb, var(--foreground) 5%, var(--rep-surface-sidebar));
+}
+
+.app-sidebar__logo-btn:focus-visible {
+  outline: var(--rep-focus-ring);
+  outline-offset: 2px;
+}
+
+.app-sidebar__link {
+  color: var(--sidebar-foreground);
+}
+
+.app-sidebar__link:hover:not(.app-sidebar__link--disabled) {
+  background: color-mix(in srgb, var(--foreground) 5%, var(--rep-surface-sidebar));
+}
+
+.app-sidebar__link--active {
+  background: var(--rep-surface-active);
+  color: var(--sidebar-primary);
+  font-weight: 600;
+  box-shadow: inset 3px 0 0 0 var(--sidebar-primary);
+}
+
+.app-sidebar--collapsed .app-sidebar__link,
+.app-sidebar--collapsed .app-sidebar__link--disabled {
+  justify-content: center;
+  padding-inline: var(--rep-spacing-sm);
+}

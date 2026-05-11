@@ -1,0 +1,27 @@
+<article
+  class="rep-card"
+  [class.rep-card--compact]="compact()"
+  [class.rep-card--pad-sm]="padding() === 'sm' && !compact()"
+  [class.rep-card--pad-md]="padding() === 'md' && !compact()"
+>
+  <ng-content select="[repCardHeader]" />
+
+  @if (title() || subtitle()) {
+    <header class="rep-card__header">
+      @if (title()) {
+        <h3 class="rep-card__title">{{ title() }}</h3>
+      }
+      @if (subtitle()) {
+        <p class="rep-card__subtitle rep-muted-text rep-caption">{{ subtitle() }}</p>
+      }
+    </header>
+  }
+
+  <div class="rep-card__body">
+    <ng-content />
+  </div>
+
+  <footer class="rep-card__footer">
+    <ng-content select="[repCardFooter]" />
+  </footer>
+</article>

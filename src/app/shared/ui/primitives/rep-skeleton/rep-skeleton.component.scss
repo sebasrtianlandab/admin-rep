@@ -1,0 +1,79 @@
+:host {
+  display: block;
+}
+
+.rep-skel__line,
+.rep-skel__card-h,
+.rep-skel__card-b,
+.rep-skel--avatar,
+.rep-skel__cell {
+  border-radius: var(--radius-sm);
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--muted) 85%, transparent) 0%,
+    color-mix(in srgb, var(--muted-foreground) 12%, transparent) 50%,
+    color-mix(in srgb, var(--muted) 85%, transparent) 100%
+  );
+  background-size: 200% 100%;
+  animation: rep-skel-shimmer 1.2s ease-in-out infinite;
+}
+
+@keyframes rep-skel-shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+.rep-skel--text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.rep-skel__line {
+  height: 0.75rem;
+}
+
+.rep-skel--card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--card);
+}
+
+.rep-skel__card-h {
+  height: 1rem;
+  width: 40%;
+}
+
+.rep-skel__card-b {
+  height: 0.65rem;
+  width: 100%;
+}
+
+.rep-skel__card-b--short {
+  width: 70%;
+}
+
+.rep-skel--avatar {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--radius-md);
+}
+
+.rep-skel--row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-md);
+  align-items: center;
+}
+
+.rep-skel__cell {
+  height: 0.75rem;
+}

@@ -1,0 +1,29 @@
+@if (mobileNavOpen()) {
+  <button
+    type="button"
+    class="fixed inset-0 z-40 bg-black/45 md:hidden"
+    aria-label="Cerrar menú"
+    (click)="closeMobileNav()"
+  ></button>
+}
+
+<div class="flex h-full min-h-0 bg-background">
+  <div
+    class="z-50 flex h-full shrink-0 md:relative max-md:fixed max-md:bottom-0 max-md:left-0 max-md:top-0 max-md:transition-transform max-md:duration-200"
+    [class.max-md:-translate-x-full]="!mobileNavOpen()"
+  >
+    <app-app-sidebar
+      [items]="navItems"
+      [collapsed]="sidebarCollapsed()"
+      (closeMobile)="closeMobileNav()"
+      (toggleCollapse)="toggleSidebarCollapsed()"
+    />
+  </div>
+
+  <div class="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-background">
+    <app-app-topbar class="shrink-0" (menuClick)="openMobileNav()" />
+    <main class="rep-page-spacing rep-scroll-area min-h-0 flex-1 bg-background">
+      <router-outlet />
+    </main>
+  </div>
+</div>

@@ -1,0 +1,13 @@
+@if (items().length) {
+  <ul class="rep-stat-list" [class.rep-stat-list--compact]="compact()">
+    @for (item of items(); track item.label) {
+      <li class="rep-stat-list__row">
+        <span class="rep-stat-list__label rep-muted-text rep-caption">{{ item.label }}</span>
+        <span class="rep-stat-list__value rep-table-text">{{ item.value }}</span>
+        @if (item.hint) {
+          <span class="rep-stat-list__hint rep-muted-text rep-caption">{{ item.hint }}</span>
+        }
+      </li>
+    }
+  </ul>
+}

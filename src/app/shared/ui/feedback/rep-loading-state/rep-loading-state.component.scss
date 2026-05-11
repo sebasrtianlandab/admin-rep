@@ -1,0 +1,17 @@
+:host {
+  display: block;
+}
+
+.rep-loading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.rep-loading__msg {
+  margin: 0;
+}
+
+.rep-loading__body:empty {
+  display: none;
+}

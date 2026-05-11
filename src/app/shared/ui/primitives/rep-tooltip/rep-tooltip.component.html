@@ -1,0 +1,12 @@
+<span
+  class="rep-tooltip"
+  [class.rep-tooltip--bottom]="placement() === 'bottom'"
+  tabindex="0"
+>
+  <span class="rep-tooltip__trigger">
+    <ng-content />
+  </span>
+  @if (text()) {
+    <span class="rep-tooltip__bubble rep-caption" role="tooltip">{{ text() }}</span>
+  }
+</span>

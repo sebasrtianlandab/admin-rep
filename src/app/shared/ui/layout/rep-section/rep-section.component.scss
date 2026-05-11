@@ -1,0 +1,19 @@
+:host {
+  display: block;
+}
+
+.rep-section__head {
+  margin-bottom: var(--spacing-sm);
+}
+
+.rep-section__title {
+  margin: 0;
+}
+
+.rep-section__sub {
+  margin: var(--spacing-xs) 0 0;
+}
+
+.rep-section__body {
+  min-width: 0;
+}

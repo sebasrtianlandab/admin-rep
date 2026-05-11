@@ -1,0 +1,65 @@
+<app-rep-page-container>
+  <app-rep-toolbar>
+    <div class="flex min-w-0 flex-1 flex-col gap-3">
+      <a routerLink="/parameters" class="parameters-shell__back">
+        <lucide-icon name="chevron-left" [size]="16" />
+        Centro de parámetros
+      </a>
+      <app-rep-page-header
+        eyebrow="Identidad"
+        title="Branding"
+        description="Logos, favicon, tokens de color y textos institucionales. Cambios aquí se reflejan en todo el portal."
+      />
+    </div>
+    <div class="flex shrink-0 items-center gap-2">
+      @if (data(); as d) {
+        <app-rep-badge variant="outline" [label]="'Mock · ' + (d.generatedAt | date : 'medium')" />
+      }
+      <app-rep-button variant="outline" size="md" [loading]="loading()" (clicked)="refresh()">
+        <lucide-icon name="refresh-cw" [size]="16" [class.animate-spin]="loading()" />
+        Actualizar
+      </app-rep-button>
+    </div>
+  </app-rep-toolbar>
+
+  @if (error(); as err) {
+    <app-rep-error-state title="No se pudo cargar la sección" [description]="err" />
+  }
+
+  <app-rep-section ariaLabel="Identidad visual">
+    <div class="parameters-shell__grid">
+      @if (loading() && !data()) {
+        <app-rep-card title="Cargando…" [compact]="true" [padding]="'sm'">
+          <p class="rep-muted-text rep-caption">Obteniendo snapshot mock.</p>
+        </app-rep-card>
+      } @else {
+        @if (data(); as b) {
+          <app-rep-card title="Marca" [compact]="true" [padding]="'sm'">
+            <dl class="parameters-shell__dl">
+              <dt>Nombre portal</dt>
+              <dd>{{ b.portalName }}</dd>
+              <dt>Línea institucional</dt>
+              <dd>{{ b.institutionalLine }}</dd>
+            </dl>
+          </app-rep-card>
+          <app-rep-card title="Activos gráficos" subtitle="Subidas y variantes" [compact]="true" [padding]="'sm'">
+            <dl class="parameters-shell__dl">
+              <dt>Logo</dt>
+              <dd class="rep-caption">{{ b.logoNote }}</dd>
+              <dt>Favicon</dt>
+              <dd class="rep-caption">{{ b.faviconNote }}</dd>
+            </dl>
+          </app-rep-card>
+          <app-rep-card title="Tokens de color" [compact]="true" [padding]="'sm'">
+            <dl class="parameters-shell__dl">
+              <dt>Primario</dt>
+              <dd><code class="rep-caption">{{ b.primaryToken }}</code></dd>
+              <dt>Secundario / superficie</dt>
+              <dd><code class="rep-caption">{{ b.secondaryToken }}</code></dd>
+            </dl>
+          </app-rep-card>
+        }
+      }
+    </div>
+  </app-rep-section>
+</app-rep-page-container>

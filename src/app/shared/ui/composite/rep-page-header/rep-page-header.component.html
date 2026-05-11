@@ -1,0 +1,9 @@
+<header class="rep-page-header">
+  @if (eyebrow()) {
+    <p class="rep-page-header__eyebrow rep-section-title">{{ eyebrow() }}</p>
+  }
+  <h1 class="rep-page-header__title rep-page-title">{{ title() }}</h1>
+  @if (description()) {
+    <p class="rep-page-header__desc rep-muted-text">{{ description() }}</p>
+  }
+</header>

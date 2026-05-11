@@ -1,0 +1,99 @@
+<app-rep-page-container>
+  <app-rep-toolbar>
+    <app-rep-page-header
+      eyebrow="Panel de control"
+      title="Resumen operativo"
+      description="Vista consolidada con datos de demostración. Las integraciones con API y autenticación se añadirán en fases posteriores."
+    />
+    <div class="flex shrink-0 items-center gap-2">
+      @if (snapshot(); as snap) {
+        <app-rep-badge
+          variant="outline"
+          [label]="'Actualizado · ' + (snap.generatedAt | date : 'medium')"
+        />
+      }
+      <app-rep-button variant="outline" size="md" [loading]="loading()" (clicked)="refresh()">
+        <lucide-icon name="refresh-cw" [size]="16" [class.animate-spin]="loading()" />
+        Actualizar
+      </app-rep-button>
+    </div>
+  </app-rep-toolbar>
+
+  @if (error(); as err) {
+    <app-rep-error-state title="No se pudo cargar el panel" [description]="err" />
+  }
+
+  <app-rep-section [ariaLabel]="'Indicadores clave'">
+    <div class="rep-grid-kpi">
+      @if (loading() && !snapshot()) {
+        @for (i of [1, 2, 3, 4]; track i) {
+          <app-rep-kpi-card label="…" value="—" [loading]="true" iconName="activity" />
+        }
+      } @else {
+        @if (snapshot(); as snap) {
+          @for (k of snap.kpis; track k.id) {
+            <app-rep-kpi-card
+              [label]="k.label"
+              [value]="k.value"
+              [hint]="k.hint"
+              [iconName]="k.icon"
+              [trendLabel]="k.trendLabel"
+              [trendPositive]="k.trendPositive"
+            />
+          }
+        }
+      }
+    </div>
+  </app-rep-section>
+
+  <app-rep-section [ariaLabel]="'Detalle y gráficos'">
+    <div class="rep-card-grid">
+      <div class="rep-card-grid__main">
+        @if (snapshot(); as snap) {
+          @for (c of snap.charts; track c.id) {
+            <app-dashboard-chart-panel [title]="c.title" [description]="c.description" />
+          }
+        }
+      </div>
+
+      <div class="rep-card-grid__aside">
+        <app-rep-card title="Vista rápida" subtitle="Contadores operativos (mock)" [padding]="'sm'">
+          @if (snapshot(); as snap) {
+            <ul class="divide-y divide-border">
+              @for (line of snap.quickStats; track line.label) {
+                <li
+                  class="flex items-center justify-between gap-3 py-2.5 text-sm first:pt-0 last:pb-0"
+                >
+                  <span class="text-muted-foreground">{{ line.label }}</span>
+                  <span class="font-semibold tabular-nums text-foreground">{{ line.value }}</span>
+                </li>
+              }
+            </ul>
+          }
+        </app-rep-card>
+
+        <app-rep-card title="Estado" subtitle="Marcadores de producto" [padding]="'sm'">
+          <div class="flex flex-wrap gap-2">
+            <app-rep-badge variant="success" label="API · desconectado (esperado)" />
+            <app-rep-badge variant="warning" label="Datos · simulados" />
+            <app-rep-badge variant="default" label="Arquitectura · por capas" />
+          </div>
+        </app-rep-card>
+      </div>
+    </div>
+  </app-rep-section>
+
+  <app-rep-section [ariaLabel]="'Actividad reciente'">
+    <app-rep-card title="Actividad reciente" subtitle="Últimos eventos registrados (demostración)" [padding]="'sm'">
+      <app-rep-data-table
+        [columns]="activityColumns"
+        [rows]="activityRows()"
+        [loading]="loading() && !snapshot()"
+        emptyMessage="No hay actividad para mostrar."
+        [density]="'comfortable'"
+        [paginationEnabled]="true"
+        [pageSize]="4"
+      />
+    </app-rep-card>
+  </app-rep-section>
+</app-rep-page-container>

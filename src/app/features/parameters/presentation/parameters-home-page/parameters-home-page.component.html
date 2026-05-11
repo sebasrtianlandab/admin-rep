@@ -1,0 +1,71 @@
+<app-rep-page-container>
+  <app-rep-toolbar>
+    <div class="flex min-w-0 flex-1 flex-col gap-3">
+      <a routerLink="/parameters" class="parameters-shell__back">
+        <lucide-icon name="chevron-left" [size]="16" />
+        Centro de parámetros
+      </a>
+      <app-rep-page-header
+        eyebrow="Contenido público"
+        title="Inicio y contenido"
+        description="Hero, llamadas a la acción, FAQs y bloques visibles en la landing. Preparado para vista previa y versionado en fases posteriores."
+      />
+    </div>
+    <div class="flex shrink-0 items-center gap-2">
+      @if (data(); as d) {
+        <app-rep-badge variant="outline" [label]="'Mock · ' + (d.generatedAt | date : 'medium')" />
+      }
+      <app-rep-button variant="outline" size="md" [loading]="loading()" (clicked)="refresh()">
+        <lucide-icon name="refresh-cw" [size]="16" [class.animate-spin]="loading()" />
+        Actualizar
+      </app-rep-button>
+    </div>
+  </app-rep-toolbar>
+
+  @if (error(); as err) {
+    <app-rep-error-state title="No se pudo cargar la sección" [description]="err" />
+  }
+
+  <app-rep-section ariaLabel="Resumen editorial">
+    <div class="parameters-shell__grid">
+      @if (loading() && !data()) {
+        <app-rep-card title="Cargando…" [compact]="true" [padding]="'sm'">
+          <p class="rep-muted-text rep-caption">Obteniendo snapshot mock.</p>
+        </app-rep-card>
+      } @else {
+        @if (data(); as h) {
+          <app-rep-card title="Hero" subtitle="Mensaje principal sobre la imagen" [compact]="true" [padding]="'sm'">
+            <dl class="parameters-shell__dl">
+              <dt>Antetítulo</dt>
+              <dd>{{ h.heroEyebrow }}</dd>
+              <dt>Título</dt>
+              <dd>{{ h.heroTitle }}</dd>
+              <dt>Subtítulo</dt>
+              <dd>{{ h.heroSubtitle }}</dd>
+              <dt>Imagen</dt>
+              <dd class="rep-muted-text rep-caption">{{ h.heroImagePath }}</dd>
+            </dl>
+          </app-rep-card>
+          <app-rep-card title="Llamadas a la acción" [compact]="true" [padding]="'sm'">
+            <dl class="parameters-shell__dl">
+              <dt>Primaria</dt>
+              <dd>{{ h.ctaPrimary }}</dd>
+              <dt>Secundaria</dt>
+              <dd>{{ h.ctaSecondary }}</dd>
+            </dl>
+          </app-rep-card>
+          <app-rep-card title="FAQs y listados" [compact]="true" [padding]="'sm'">
+            <dl class="parameters-shell__dl">
+              <dt>Ítems FAQ</dt>
+              <dd>{{ h.faqItemsCount }}</dd>
+              <dt>Límite destacados (home)</dt>
+              <dd>{{ h.featuredStripLimit }}</dd>
+              <dt>Tira “últimas”</dt>
+              <dd>{{ h.latestStripLimit }}</dd>
+            </dl>
+          </app-rep-card>
+        }
+      }
+    </div>
+  </app-rep-section>
+</app-rep-page-container>

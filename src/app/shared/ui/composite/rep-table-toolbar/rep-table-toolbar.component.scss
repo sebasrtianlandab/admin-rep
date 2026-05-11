@@ -1,0 +1,42 @@
+:host {
+  display: block;
+}
+
+/* Banda de herramientas sobre la tabla: misma lectura que rep-card / rep-field, separada del grid */
+.rep-table-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rep-spacing-md);
+  margin-bottom: var(--rep-spacing-lg);
+  padding: var(--rep-spacing-md) var(--rep-spacing-lg);
+  border: 1px solid color-mix(in srgb, var(--border) 88%, var(--rep-surface-app));
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--muted) 38%, var(--rep-surface-card));
+  box-shadow: var(--rep-shadow-sm);
+}
+
+@media (min-width: 48rem) {
+  .rep-table-toolbar {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.rep-table-toolbar__start,
+.rep-table-toolbar__end {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--rep-spacing-sm);
+  min-width: 0;
+}
+
+.rep-table-toolbar__end {
+  justify-content: flex-end;
+}
+
+.rep-table-toolbar__start:empty,
+.rep-table-toolbar__end:empty {
+  display: none;
+}

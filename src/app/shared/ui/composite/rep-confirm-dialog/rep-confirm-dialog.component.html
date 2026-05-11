@@ -1,0 +1,19 @@
+<dialog
+  #dlg
+  class="rep-dialog"
+  (click)="onDialogClick($event)"
+  (cancel)="onEsc($event)"
+>
+  <div class="rep-dialog__panel" (click)="$event.stopPropagation()">
+    <h2 class="rep-dialog__title">{{ titleText() }}</h2>
+    <p class="rep-dialog__msg rep-muted-text">{{ messageText() }}</p>
+    <div class="rep-dialog__actions">
+      <app-rep-button variant="ghost" type="button" (clicked)="onCancel()">
+        {{ cancelLabel() }}
+      </app-rep-button>
+      <app-rep-button type="button" [variant]="confirmVariant()" (clicked)="onConfirm()">
+        {{ confirmLabel() }}
+      </app-rep-button>
+    </div>
+  </div>
+</dialog>

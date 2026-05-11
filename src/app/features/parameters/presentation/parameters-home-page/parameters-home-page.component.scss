@@ -1,0 +1,6 @@
+@use '../parameters-shell' as shell;
+
+:host {
+  display: block;
+  @include shell.parameters-shell-layout();
+}

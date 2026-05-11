@@ -1,0 +1,10 @@
+@use '../../../../../styles/rep-field' as *;
+
+:host {
+  display: block;
+}
+
+.rep-field__control--textarea {
+  min-height: 4.5rem;
+  resize: vertical;
+}

@@ -1,0 +1,38 @@
+:host {
+  display: block;
+}
+
+.rep-stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background: var(--card);
+  box-shadow: var(--shadow-sm);
+}
+
+.rep-stat--compact {
+  padding: var(--spacing-md);
+}
+
+.rep-stat__label {
+  margin: 0;
+}
+
+.rep-stat__value {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--foreground);
+}
+
+.rep-stat--compact .rep-stat__value {
+  font-size: 1.125rem;
+}
+
+.rep-stat__hint {
+  margin: 0;
+}

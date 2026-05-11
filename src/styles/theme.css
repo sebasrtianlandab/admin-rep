@@ -1,0 +1,40 @@
+/**
+ * Theme layer — dark mode UX, motion, selection (ThemeService toggles `html.dark`).
+ */
+
+html {
+  color-scheme: light;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html,
+  body {
+    transition:
+      background-color 0.18s ease,
+      color 0.18s ease;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+::selection {
+  background-color: color-mix(in srgb, var(--primary) 28%, transparent);
+  color: var(--foreground);
+}
+
+.dark ::selection {
+  background-color: color-mix(in srgb, var(--primary) 35%, transparent);
+  color: var(--foreground);
+}

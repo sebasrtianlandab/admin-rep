@@ -1,0 +1,74 @@
+<app-rep-page-container>
+  <app-rep-toolbar>
+    <app-rep-page-header
+      eyebrow="Marketplace"
+      title="Propiedades"
+      description="Moderación y operación. Estados alineados a `property_status_config` y flujos publish/pause del backend."
+    />
+    <div class="flex shrink-0 items-center gap-2">
+      @if (snapshot(); as snap) {
+        <app-rep-badge
+          variant="outline"
+          [label]="'Actualizado · ' + (snap.generatedAt | date : 'medium')"
+        />
+      }
+      <app-rep-button variant="outline" size="md" [loading]="loading()" (clicked)="refresh()">
+        <lucide-icon name="refresh-cw" [size]="16" [class.animate-spin]="loading()" />
+        Actualizar
+      </app-rep-button>
+    </div>
+  </app-rep-toolbar>
+
+  @if (error(); as err) {
+    <app-rep-error-state title="No se pudo cargar el módulo" [description]="err" />
+  }
+
+  <app-rep-section [ariaLabel]="'Indicadores'">
+    <div class="rep-grid-kpi">
+      @if (loading() && !snapshot()) {
+        @for (i of [1, 2, 3, 4]; track i) {
+          <app-rep-kpi-card label="…" value="—" [loading]="true" iconName="building-2" />
+        }
+      } @else {
+        @if (snapshot(); as snap) {
+          @for (k of snap.kpis; track k.id) {
+            <app-rep-kpi-card
+              [label]="k.label"
+              [value]="k.value"
+              [hint]="k.hint"
+              [iconName]="k.icon"
+              [trendLabel]="k.trendLabel"
+              [trendPositive]="k.trendPositive"
+            />
+          }
+        }
+      }
+    </div>
+  </app-rep-section>
+
+  <app-rep-section [ariaLabel]="'Listado'">
+    <app-rep-card title="Inmuebles" subtitle="Tabla enterprise (mock)" [padding]="'sm'">
+      <app-rep-table-toolbar>
+        <div repTableToolbarStart class="min-w-0 flex-1">
+          <app-rep-filter-bar
+            [(search)]="search"
+            searchPlaceholder="Buscar ref., título o ciudad…"
+            [resetDisabled]="search().trim() === ''"
+            (reset)="onFilterReset()"
+          />
+        </div>
+      </app-rep-table-toolbar>
+      <app-rep-data-table
+        [columns]="columns"
+        [rows]="filteredRows()"
+        [loading]="loading() && !snapshot()"
+        [emptyMode]="emptyMode()"
+        emptyMessage="Sin propiedades en el mock."
+        emptyDescription="Con API admin se listarán borradores y publicadas globales."
+        [density]="'comfortable'"
+        [paginationEnabled]="true"
+        [pageSize]="8"
+      />
+    </app-rep-card>
+  </app-rep-section>
+</app-rep-page-container>

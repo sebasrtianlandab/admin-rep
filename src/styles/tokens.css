@@ -1,0 +1,204 @@
+/**
+ * Design tokens — REP admin enterprise layer.
+ * Single source for semantic color, elevation, spacing, radii, shell metrics.
+ */
+
+:root {
+  /* —— Surface hierarchy (ERP) — semantic layers —— */
+  --rep-surface-app: #f0f3f7;
+  --rep-surface-sidebar: #e8f0f8;
+  --rep-surface-card: #ffffff;
+  --rep-surface-elevated: #fafcfd;
+  --rep-surface-hover: color-mix(in srgb, var(--foreground) 5%, var(--rep-surface-card));
+  --rep-surface-active: color-mix(in srgb, var(--primary) 10%, var(--rep-surface-sidebar));
+  --rep-surface-overlay: rgb(15 23 42 / 0.42);
+
+  /* —— Brand (REP) —— */
+  --background: var(--rep-surface-app);
+  --foreground: #212832;
+  --card: var(--rep-surface-card);
+  --card-foreground: #212832;
+  --muted: #e8edf3;
+  --muted-foreground: #64748b;
+  --border: #e2e8f0;
+  --primary: #663366;
+  --primary-foreground: #fdfdfd;
+  --secondary: #1d6bad;
+  --secondary-foreground: #ffffff;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --ring: #663366;
+
+  /* —— Semantic status (UI + badges) —— */
+  --success: #047857;
+  --success-foreground: #ecfdf5;
+  --success-muted: color-mix(in srgb, #059669 14%, transparent);
+  --warning: #b45309;
+  --warning-foreground: #fffbeb;
+  --warning-muted: color-mix(in srgb, #d97706 16%, transparent);
+  --danger: #dc2626;
+  --danger-foreground: #fef2f2;
+  --danger-muted: color-mix(in srgb, var(--danger) 14%, transparent);
+  --info: #1d6bad;
+  --info-foreground: #eff6ff;
+  --info-muted: color-mix(in srgb, var(--info) 14%, transparent);
+  --pending: #92400e;
+  --pending-foreground: #fffbeb;
+  --pending-muted: color-mix(in srgb, #d97706 12%, transparent);
+  --neutral: #57534e;
+  --neutral-foreground: #f5f5f4;
+  --neutral-muted: color-mix(in srgb, var(--neutral) 12%, transparent);
+
+  /* —— Elevation —— */
+  --shadow-sm: 0 1px 2px 0 rgb(15 23 42 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(15 23 42 / 0.08), 0 2px 4px -2px rgb(15 23 42 / 0.06);
+  --shadow-lg: 0 10px 15px -3px rgb(15 23 42 / 0.08), 0 4px 6px -4px rgb(15 23 42 / 0.06);
+  --shadow-overlay: 0 25px 50px -12px rgb(0 0 0 / 0.22);
+
+  /* —— Spacing scale —— */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 0.75rem;
+  --spacing-lg: 1rem;
+  --spacing-xl: 1.5rem;
+  --spacing-2xl: 2rem;
+
+  /* —— Radius scale —— */
+  --radius: 0.5rem;
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  /* —— Shell / ERP chrome —— */
+  --toolbar-height: 3rem;
+  --table-row-height: 2.25rem;
+  --table-row-height-compact: 2rem;
+  /** @deprecated Use --table-row-height; kept for Tailwind / legacy references */
+  --erp-row-height: var(--table-row-height);
+  --rep-sidebar-width: 15rem;
+  --rep-sidebar-width-collapsed: 4rem;
+  /** Altura única de la franja superior: marca del sidebar + topbar (línea inferior alineada). */
+  --rep-shell-header-height: 3.5rem;
+  --rep-page-padding-x: 1rem;
+  --rep-page-padding-y: 1rem;
+  /* Columna contenido centrada (~1216px): márgenes laterales simétricos como panel ERP de referencia */
+  --rep-page-max-width: 76rem;
+  --rep-section-gap: 1.25rem;
+  --rep-content-gap: 1rem;
+  --rep-gutter: 1rem;
+
+  --sidebar: var(--rep-surface-sidebar);
+  --sidebar-foreground: #212529;
+  --sidebar-primary: #663366;
+  --sidebar-accent: #e8f2fa;
+  --sidebar-border: #d2d1d1;
+
+  --font-display: 'Lora', ui-serif, Georgia, serif;
+  --font-sans: 'Open Sans', ui-sans-serif, system-ui, sans-serif;
+
+  /* —— REP semantic aliases (prefer in component SCSS over raw scales) —— */
+  --rep-spacing-xs: var(--spacing-xs);
+  --rep-spacing-sm: var(--spacing-sm);
+  --rep-spacing-md: var(--spacing-md);
+  --rep-spacing-lg: var(--spacing-lg);
+  --rep-spacing-xl: var(--spacing-xl);
+
+  --rep-font-size-xs: 0.6875rem;
+  --rep-font-size-sm: 0.8125rem;
+  --rep-font-size-md: 0.875rem;
+  --rep-font-size-lg: 1rem;
+  --rep-font-size-xl: 1.125rem;
+  --rep-font-size-2xl: 1.25rem;
+
+  --rep-shadow-sm: var(--shadow-sm);
+  --rep-shadow-md: var(--shadow-md);
+  --rep-shadow-lg: var(--shadow-lg);
+
+  --rep-transition-fast: 120ms ease;
+  --rep-transition-normal: 180ms ease;
+  --rep-transition-slow: 260ms ease;
+
+  --rep-topbar-height: var(--rep-shell-header-height);
+  --rep-table-row-height: var(--table-row-height);
+  --rep-table-row-height-compact: var(--table-row-height-compact);
+
+  --rep-focus-ring-width: 2px;
+  --rep-focus-ring-offset: 2px;
+  --rep-focus-ring: var(--rep-focus-ring-width) solid var(--ring);
+
+  --rep-success: var(--success);
+  --rep-warning: var(--warning);
+  --rep-info: var(--info);
+  --rep-danger: var(--danger);
+
+  --rep-z-base: 0;
+  --rep-z-sticky: 10;
+  --rep-z-dropdown: 40;
+  --rep-z-overlay: 50;
+  --rep-z-modal: 60;
+}
+
+@media (min-width: 48rem) {
+  :root {
+    --rep-page-padding-x: 1.5rem;
+    --rep-page-padding-y: 1.25rem;
+    --rep-gutter: 1.25rem;
+  }
+}
+
+.dark {
+  /* Surfaces — dark: app darkest, cards step up, elevated for chrome */
+  --rep-surface-app: #07080b;
+  --rep-surface-sidebar: #0a0c10;
+  --rep-surface-card: #10141a;
+  --rep-surface-elevated: #151a22;
+  --rep-surface-hover: color-mix(in srgb, #ffffff 6%, var(--rep-surface-card));
+  --rep-surface-active: color-mix(in srgb, var(--primary) 14%, var(--rep-surface-sidebar));
+  --rep-surface-overlay: rgb(0 0 0 / 0.58);
+
+  --background: var(--rep-surface-app);
+  --foreground: #f6f8f8;
+  --card: var(--rep-surface-card);
+  --card-foreground: #f6f8f8;
+  --muted: #161b22;
+  --muted-foreground: #9ba6a6;
+  --border: #262a31;
+  --primary: #bd76bd;
+  --primary-foreground: #1a0b1a;
+  --secondary: #3086cf;
+  --secondary-foreground: #021223;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --ring: #bd76bd;
+
+  --success: #34d399;
+  --success-foreground: #022c22;
+  --success-muted: color-mix(in srgb, #34d399 18%, transparent);
+  --warning: #fbbf24;
+  --warning-foreground: #1c1917;
+  --warning-muted: color-mix(in srgb, #fbbf24 16%, transparent);
+  --danger: #f87171;
+  --danger-foreground: #450a0a;
+  --danger-muted: color-mix(in srgb, #f87171 16%, transparent);
+  --info: #7dd3fc;
+  --info-foreground: #0c4a6e;
+  --info-muted: color-mix(in srgb, #7dd3fc 18%, transparent);
+  --pending: #fcd34d;
+  --pending-foreground: #292524;
+  --pending-muted: color-mix(in srgb, #fcd34d 14%, transparent);
+  --neutral: #a8a29e;
+  --neutral-foreground: #1c1917;
+  --neutral-muted: color-mix(in srgb, #a8a29e 16%, transparent);
+
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.35);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.35), 0 2px 4px -2px rgb(0 0 0 / 0.28);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.38), 0 4px 6px -4px rgb(0 0 0 / 0.28);
+  --shadow-overlay: 0 25px 50px -12px rgb(0 0 0 / 0.55);
+
+  --sidebar: var(--rep-surface-sidebar);
+  --sidebar-foreground: #e7ecec;
+  --sidebar-primary: #bd76bd;
+  --sidebar-accent: #1b1f26;
+  --sidebar-border: #262a31;
+}

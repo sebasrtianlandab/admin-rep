@@ -1,0 +1,29 @@
+<div class="rep-filter-bar">
+  <div class="rep-filter-bar__search">
+    <div class="rep-filter-bar__search-row">
+      <span class="rep-filter-bar__search-icon-wrap" aria-hidden="true">
+        <span class="rep-filter-bar__search-icon-inner">
+          <lucide-icon name="search" [size]="18" />
+        </span>
+      </span>
+      <app-rep-input
+        class="rep-filter-bar__input"
+        [type]="'search'"
+        [label]="searchLabel()"
+        [placeholder]="searchPlaceholder()"
+        [embedded]="true"
+        [(value)]="search"
+      />
+    </div>
+  </div>
+
+  <div class="rep-filter-bar__actions">
+    <ng-content select="[repFilterActions]" />
+    @if (showReset()) {
+      <app-rep-button variant="outline" size="sm" [disabled]="resetDisabled()" (clicked)="reset.emit()">
+        <lucide-icon name="rotate-ccw" class="size-4" aria-hidden="true" />
+        Restablecer
+      </app-rep-button>
+    }
+  </div>
+</div>

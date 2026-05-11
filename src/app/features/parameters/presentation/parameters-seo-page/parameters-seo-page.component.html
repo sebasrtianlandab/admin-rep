@@ -1,0 +1,55 @@
+<app-rep-page-container>
+  <app-rep-toolbar>
+    <div class="flex min-w-0 flex-1 flex-col gap-3">
+      <a routerLink="/parameters" class="parameters-shell__back">
+        <lucide-icon name="chevron-left" [size]="16" />
+        Centro de parámetros
+      </a>
+      <app-rep-page-header
+        eyebrow="Descubrimiento"
+        title="SEO y marketing"
+        description="Metadatos por defecto, Open Graph y política de sitemap. Vista previa SERP se añadirá con iframe seguro."
+      />
+    </div>
+    <div class="flex shrink-0 items-center gap-2">
+      @if (data(); as d) {
+        <app-rep-badge variant="outline" [label]="'Mock · ' + (d.generatedAt | date : 'medium')" />
+      }
+      <app-rep-button variant="outline" size="md" [loading]="loading()" (clicked)="refresh()">
+        <lucide-icon name="refresh-cw" [size]="16" [class.animate-spin]="loading()" />
+        Actualizar
+      </app-rep-button>
+    </div>
+  </app-rep-toolbar>
+
+  @if (error(); as err) {
+    <app-rep-error-state title="No se pudo cargar la sección" [description]="err" />
+  }
+
+  <app-rep-section ariaLabel="Metadatos">
+    <div class="parameters-shell__grid">
+      @if (loading() && !data()) {
+        <app-rep-card title="Cargando…" [compact]="true" [padding]="'sm'">
+          <p class="rep-muted-text rep-caption">Obteniendo snapshot mock.</p>
+        </app-rep-card>
+      } @else {
+        @if (data(); as s) {
+          <app-rep-card title="Etiquetas por defecto" [compact]="true" [padding]="'sm'">
+            <dl class="parameters-shell__dl">
+              <dt>Title</dt>
+              <dd>{{ s.defaultTitle }}</dd>
+              <dt>Description</dt>
+              <dd>{{ s.defaultDescription }}</dd>
+            </dl>
+          </app-rep-card>
+          <app-rep-card title="Open Graph" [compact]="true" [padding]="'sm'">
+            <p class="rep-caption">{{ s.ogImageNote }}</p>
+          </app-rep-card>
+          <app-rep-card title="Sitemap" [compact]="true" [padding]="'sm'">
+            <p class="rep-caption">{{ s.sitemapPolicy }}</p>
+          </app-rep-card>
+        }
+      }
+    </div>
+  </app-rep-section>
+</app-rep-page-container>

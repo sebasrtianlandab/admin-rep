@@ -1,0 +1,23 @@
+:host {
+  display: contents;
+}
+
+.rep-divider {
+  margin: 0;
+  border: 0;
+  flex-shrink: 0;
+  background: var(--border);
+}
+
+.rep-divider--horizontal {
+  display: block;
+  width: 100%;
+  height: 1px;
+}
+
+.rep-divider--vertical {
+  display: inline-block;
+  width: 1px;
+  align-self: stretch;
+  min-height: 1rem;
+}

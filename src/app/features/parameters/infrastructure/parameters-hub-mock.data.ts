@@ -1,0 +1,92 @@
+import type { ParametersHubSnapshot } from '@features/parameters/domain/parameters-hub.models';
+
+export function buildParametersHubSnapshot(): ParametersHubSnapshot {
+  return {
+    generatedAt: new Date().toISOString(),
+    cards: [
+      {
+        id: 'home',
+        path: 'home',
+        title: 'Inicio y contenido público',
+        description:
+          'Hero, CTAs, FAQs, banners, testimonios y bloques de la landing. Pensado para marketing y producto.',
+        impact: 'Alto en conversión y percepción de marca',
+        risk: 'Medio',
+        lastModified: '2026-05-08T14:20:00.000Z',
+        icon: 'house',
+      },
+      {
+        id: 'branding',
+        path: 'branding',
+        title: 'Branding',
+        description: 'Logos, favicon, paleta, modo oscuro y textos institucionales.',
+        impact: 'Alto en reconocimiento visual',
+        risk: 'Medio',
+        lastModified: '2026-04-22T09:10:00.000Z',
+        icon: 'palette',
+      },
+      {
+        id: 'marketplace',
+        path: 'marketplace',
+        title: 'Marketplace',
+        description:
+          'Estados de publicación, badges, destacados, moderación y límites operativos del catálogo.',
+        impact: 'Crítico en operación del marketplace',
+        risk: 'Alto',
+        lastModified: '2026-05-02T11:45:00.000Z',
+        icon: 'store',
+      },
+      {
+        id: 'monetization',
+        path: 'monetization',
+        title: 'Monetización',
+        description: 'Planes, paquetes, créditos, destacados comerciales y reglas de uso.',
+        impact: 'Crítico en ingresos',
+        risk: 'Alto',
+        lastModified: '2026-05-06T16:00:00.000Z',
+        icon: 'credit-card',
+      },
+      {
+        id: 'seo',
+        path: 'seo',
+        title: 'SEO y marketing',
+        description: 'Metadatos por defecto, Open Graph, sitemap y vistas previas SERP.',
+        impact: 'Alto en descubrimiento orgánico',
+        risk: 'Medio',
+        lastModified: '2026-03-30T08:00:00.000Z',
+        icon: 'search',
+      },
+      {
+        id: 'integrations',
+        path: 'integrations',
+        title: 'Integraciones',
+        description: 'SMTP, medios, mapas, pasarelas y APIs externas.',
+        impact: 'Alto en continuidad operativa',
+        risk: 'Crítico',
+        lastModified: '2026-05-01T10:15:00.000Z',
+        icon: 'plug',
+      },
+      {
+        id: 'catalogs',
+        path: 'catalogs',
+        title: 'Catálogos',
+        description: 'Tipos, monedas, categorías y referencias maestras versionadas.',
+        impact: 'Medio en consistencia de datos',
+        risk: 'Medio',
+        lastModified: '2026-04-18T13:00:00.000Z',
+        icon: 'library',
+      },
+      {
+        id: 'advanced',
+        path: 'advanced',
+        title: 'Configuración avanzada',
+        description:
+          'Feature flags técnicos, variables internas, secretos enmascarados y ajustes low-level.',
+        impact: 'Variable; puede afectar todo el stack',
+        risk: 'Crítico',
+        lastModified: new Date().toISOString(),
+        icon: 'sliders-horizontal',
+      },
+    ],
+  };
+}
